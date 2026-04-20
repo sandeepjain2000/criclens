@@ -7,6 +7,7 @@ const ALLOWED = {
   phase:           new Set(['All', 'Powerplay', 'Middle', 'Death']),
   paceOrSpin:      new Set(['All', 'Pace', 'Spin']),
   bowlerSubtype:   new Set(['All', 'Pure Pace', 'Swing', 'Seam', 'Fast-medium', 'Off-spin', 'Leg-spin', 'Left-arm orthodox', 'Chinaman']),
+  bowlerRank:      new Set(['All', 'Rank 1', 'Top 2', 'Top 3', 'Rank 4+']),
   inningsRole:     new Set(['All', 'Batting First', 'Batting Second']),
   venueContext:    new Set(['All', 'Home', 'Away', 'Neutral']),
   competitionType: new Set(['All', 'Bilateral', 'Tournament', 'Domestic']),
@@ -23,6 +24,12 @@ function buildFilterClauses(filters) {
   if (filters.phase           !== 'All') clauses.push(`dd.over_phase                 = '${filters.phase}'`);
   if (filters.paceOrSpin      !== 'All') clauses.push(`dd.bowler_pace_or_spin        = '${filters.paceOrSpin}'`);
   if (filters.bowlerSubtype   !== 'All') clauses.push(`dd.bowler_bowling_subtype     = '${filters.bowlerSubtype}'`);
+  if (filters.bowlerRank      !== 'All') {
+    if      (filters.bowlerRank === 'Rank 1') clauses.push(`dd.bowler_match_rank = 1`);
+    else if (filters.bowlerRank === 'Top 2')  clauses.push(`dd.bowler_match_rank <= 2`);
+    else if (filters.bowlerRank === 'Top 3')  clauses.push(`dd.bowler_match_rank <= 3`);
+    else if (filters.bowlerRank === 'Rank 4+') clauses.push(`(dd.bowler_match_rank >= 4 OR dd.bowler_match_rank IS NULL)`);
+  }
   if (filters.inningsRole     !== 'All') clauses.push(`dd.innings_role               = '${filters.inningsRole}'`);
   if (filters.venueContext    !== 'All') clauses.push(`dd.venue_context              = '${filters.venueContext}'`);
   if (filters.competitionType !== 'All') clauses.push(`dd.competition_type           = '${filters.competitionType}'`);
@@ -74,6 +81,7 @@ export async function GET(request) {
     phase:           safe(searchParams.get('phase'),           'phase'),
     paceOrSpin:      safe(searchParams.get('paceOrSpin'),      'paceOrSpin'),
     bowlerSubtype:   safe(searchParams.get('bowlerSubtype'),   'bowlerSubtype'),
+    bowlerRank:      safe(searchParams.get('bowlerRank'),      'bowlerRank'),
     inningsRole:     safe(searchParams.get('inningsRole'),     'inningsRole'),
     venueContext:    safe(searchParams.get('venueContext'),     'venueContext'),
     competitionType: safe(searchParams.get('competitionType'), 'competitionType'),

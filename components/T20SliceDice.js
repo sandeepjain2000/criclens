@@ -27,6 +27,12 @@ const FILTERS = [
     emoji:   '🧠',
   },
   {
+    key:     'bowlerRank',
+    label:   'Bowler Rank',
+    options: ['All', 'Rank 1', 'Top 2', 'Top 3', 'Rank 4+'],
+    emoji:   '🏅',
+  },
+  {
     key:     'inningsRole',
     label:   'Innings',
     options: ['All', 'Batting First', 'Batting Second'],
@@ -56,6 +62,7 @@ const DEFAULT_FILTERS = {
   phase:           'All',
   paceOrSpin:      'All',
   bowlerSubtype:   'All',
+  bowlerRank:      'All',
   inningsRole:     'All',
   venueContext:    'All',
   competitionType: 'All',
@@ -249,6 +256,7 @@ export default function T20SliceDice() {
         phase:           currentFilters.phase,
         paceOrSpin:      currentFilters.paceOrSpin,
         bowlerSubtype:   currentFilters.bowlerSubtype,
+        bowlerRank:      currentFilters.bowlerRank,
         inningsRole:     currentFilters.inningsRole,
         venueContext:    currentFilters.venueContext,
         competitionType: currentFilters.competitionType,
