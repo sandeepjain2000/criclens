@@ -1,0 +1,335 @@
+
+[2026-04-07T17:35:04.868Z] USER QUERY: What is the % of runs of "V Kohli" in 2022 in Indian Team's Total Run
+SQL EXEC: SELECT SUM(d.runs_batter) * 100.0 / SUM(d.runs_total) 
+FROM deliveries d 
+JOIN innings i ON d.match_id = i.match_id AND d.inning_number = i.inning_number 
+JOIN matches m ON d.match_id = m.match_id 
+WHERE d.batter = 'V Kohli' AND i.team = 'India' AND m.date LIKE '2022%';
+ERROR: None
+DB RESULTS: [{"SUM(d.runs_batter) * 100.0 / SUM(d.runs_total)":92.01388888888889}]
+----------------------------------------
+
+[2026-04-07T17:38:10.567Z] USER QUERY: What is the % of runs of "V Kohli" in 2022 in Indian Team's Total Run
+SQL EXEC: SELECT (SUM(CASE WHEN batter = 'V Kohli' THEN runs_batter ELSE 0 END) * 100.0) / SUM(runs_total) FROM deliveries d JOIN innings i ON d.match_id = i.match_id AND d.inning_number = i.inning_number JOIN matches m ON d.match_id = m.match_id WHERE i.team = 'India' AND m.date LIKE '2022%'
+ERROR: None
+DB RESULTS: [{"(SUM(CASE WHEN batter = 'V Kohli' THEN runs_batter ELSE 0 END) * 100.0) / SUM(runs_total)":6.973684210526316}]
+----------------------------------------
+
+[2026-04-07T18:01:13.361Z] USER QUERY: List the top 5 test batters with highest career runs
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs
+FROM players p
+JOIN deliveries d ON p.name = d.batter
+GROUP BY p.name
+ORDER BY total_runs DESC
+LIMIT 5
+ERROR: None
+DB RESULTS: [{"name":"JE Root","total_runs":13943},{"name":"AN Cook","total_runs":12472},{"name":"SPD Smith","total_runs":10763},{"name":"KS Williamson","total_runs":9461},{"name":"V Kohli","total_runs":9230}]
+----------------------------------------
+
+[2026-04-07T18:03:52.016Z] USER QUERY: Give me runs of  "V Kohli" Year on year since he started playing in the test matches 
+SQL EXEC: SELECT strftime('%Y', m.date) AS year, SUM(runs_batter) AS total_runs
+FROM deliveries d
+JOIN matches m ON d.match_id = m.match_id
+WHERE d.batter = 'V Kohli'
+GROUP BY year
+ORDER BY year;
+ERROR: None
+DB RESULTS: [{"year":"2011","total_runs":202},{"year":"2012","total_runs":689},{"year":"2013","total_runs":616},{"year":"2014","total_runs":847},{"year":"2015","total_runs":640},{"year":"2016","total_runs":1215},{"year":"2017","total_runs":1059},{"year":"2018","total_runs":1322},{"year":"2019","total_runs":612},{"year":"2020","total_runs":116},{"year":"2021","total_runs":536},{"year":"2022","total_runs":265},{"year":"2023","total_runs":671},{"year":"2024","total_runs":417},{"year":"2025","total_runs":23}]
+----------------------------------------
+
+[2026-04-07T18:24:21.700Z] USER QUERY: Give Year on Year Runs of V Kohli as a Table
+SQL EXEC: SELECT SUBSTR(m.date, 1, 4) AS year, SUM(d.runs_batter) AS total_runs
+FROM deliveries d
+JOIN matches m ON d.match_id = m.match_id
+WHERE d.batter = 'V Kohli'
+GROUP BY year
+ORDER BY year;
+ERROR: None
+DB RESULTS: [{"year":"2011","total_runs":202},{"year":"2012","total_runs":689},{"year":"2013","total_runs":616},{"year":"2014","total_runs":847},{"year":"2015","total_runs":640},{"year":"2016","total_runs":1215},{"year":"2017","total_runs":1059},{"year":"2018","total_runs":1322},{"year":"2019","total_runs":612},{"year":"2020","total_runs":116},{"year":"2021","total_runs":536},{"year":"2022","total_runs":265},{"year":"2023","total_runs":671},{"year":"2024","total_runs":417},{"year":"2025","total_runs":23}]
+----------------------------------------
+
+[2026-04-07T18:32:50.596Z] USER QUERY: Give me runs of V Kohli year on year as a table
+SQL EXEC: SELECT strftime('%Y', m.date) AS year, SUM(d.runs_batter) AS total_runs
+FROM deliveries d
+JOIN matches m ON d.match_id = m.match_id
+WHERE d.batter = 'V Kohli'
+GROUP BY year
+ORDER BY year;
+ERROR: None
+DB RESULTS: [{"year":"2011","total_runs":202},{"year":"2012","total_runs":689},{"year":"2013","total_runs":616},{"year":"2014","total_runs":847},{"year":"2015","total_runs":640},{"year":"2016","total_runs":1215},{"year":"2017","total_runs":1059},{"year":"2018","total_runs":1322},{"year":"2019","total_runs":612},{"year":"2020","total_runs":116},{"year":"2021","total_runs":536},{"year":"2022","total_runs":265},{"year":"2023","total_runs":671},{"year":"2024","total_runs":417},{"year":"2025","total_runs":23}]
+----------------------------------------
+
+[2026-04-07T18:35:09.501Z] USER QUERY: Top 10 Test run scorers of all time
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs FROM deliveries d JOIN players p ON d.batter = p.name GROUP BY p.name ORDER BY total_runs DESC LIMIT 10;
+ERROR: None
+DB RESULTS: [{"name":"JE Root","total_runs":13943},{"name":"AN Cook","total_runs":12472},{"name":"SPD Smith","total_runs":10763},{"name":"KS Williamson","total_runs":9461},{"name":"V Kohli","total_runs":9230},{"name":"HM Amla","total_runs":9146},{"name":"DA Warner","total_runs":8786},{"name":"KC Sangakkara","total_runs":8489},{"name":"AB de Villiers","total_runs":8182},{"name":"MJ Clarke","total_runs":8146}]
+----------------------------------------
+
+[2026-04-07T18:35:27.317Z] USER QUERY: Top 10 Test run scorers of all time
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs FROM deliveries d JOIN players p ON d.batter = p.name GROUP BY p.name ORDER BY total_runs DESC LIMIT 10
+ERROR: None
+DB RESULTS: [{"name":"JE Root","total_runs":13943},{"name":"AN Cook","total_runs":12472},{"name":"SPD Smith","total_runs":10763},{"name":"KS Williamson","total_runs":9461},{"name":"V Kohli","total_runs":9230},{"name":"HM Amla","total_runs":9146},{"name":"DA Warner","total_runs":8786},{"name":"KC Sangakkara","total_runs":8489},{"name":"AB de Villiers","total_runs":8182},{"name":"MJ Clarke","total_runs":8146}]
+----------------------------------------
+
+[2026-04-07T18:52:20.113Z] USER QUERY: Give me runs of V Kohli year on year as a table
+SQL EXEC: SELECT strftime('%Y', m.date) AS year, SUM(d.runs_batter) AS total_runs
+FROM deliveries d
+JOIN matches m ON d.match_id = m.match_id
+WHERE d.batter = 'V Kohli'
+GROUP BY year
+ORDER BY year;
+ERROR: None
+DB RESULTS: [{"year":"2011","total_runs":202},{"year":"2012","total_runs":689},{"year":"2013","total_runs":616},{"year":"2014","total_runs":847},{"year":"2015","total_runs":640},{"year":"2016","total_runs":1215},{"year":"2017","total_runs":1059},{"year":"2018","total_runs":1322},{"year":"2019","total_runs":612},{"year":"2020","total_runs":116},{"year":"2021","total_runs":536},{"year":"2022","total_runs":265},{"year":"2023","total_runs":671},{"year":"2024","total_runs":417},{"year":"2025","total_runs":23}]
+----------------------------------------
+
+[2026-04-08T11:45:01.112Z] USER QUERY: Who is the top scorer batsman for India in 2023
+SQL EXEC: SELECT batter, SUM(runs_batter) AS total_runs FROM deliveries d JOIN innings i ON d.match_id = i.match_id AND d.inning_number = i.inning_number JOIN matches m ON d.match_id = m.match_id WHERE i.team = 'India' AND m.date LIKE '2023%' GROUP BY batter ORDER BY total_runs DESC LIMIT 1
+ERROR: None
+DB RESULTS: [{"batter":"V Kohli","total_runs":671}]
+----------------------------------------
+
+[2026-04-08T11:45:17.535Z] USER QUERY: Who is the top scorer batsman for India in 2024
+SQL EXEC: SELECT batter, SUM(runs_batter) AS total_runs FROM deliveries d JOIN innings i ON d.match_id = i.match_id AND d.inning_number = i.inning_number JOIN matches m ON d.match_id = m.match_id WHERE i.team = 'India' AND m.date LIKE '2024%' GROUP BY batter ORDER BY total_runs DESC LIMIT 1;
+ERROR: None
+DB RESULTS: [{"batter":"YBK Jaiswal","total_runs":1478}]
+----------------------------------------
+
+[2026-04-11T19:46:02.071Z] USER QUERY: How many runs were scored by Rohit Sharma in 2024 in Test Matches
+SQL EXEC: SELECT SUM(d.runs_batter) 
+FROM deliveries d 
+JOIN matches m ON d.match_id = m.match_id 
+WHERE d.batter = 'Rohit Sharma' 
+AND m.match_type = 'Test' 
+AND m.start_date LIKE '2024%';
+ERROR: None
+DB RESULTS: [{"sum":null}]
+----------------------------------------
+
+[2026-04-11T19:46:19.284Z] USER QUERY: How many runs were scored by Rohit Sharma in 2025 in Test Matches
+SQL EXEC: SELECT SUM(d.runs_batter) 
+FROM deliveries d 
+JOIN innings i ON d.innings_id = i.id 
+JOIN matches m ON d.match_id = m.match_id 
+WHERE d.batter = 'Rohit Sharma' 
+AND m.match_type = 'Test' 
+AND m.start_date LIKE '2025%';
+ERROR: None
+DB RESULTS: [{"sum":null}]
+----------------------------------------
+
+[2026-04-11T19:47:21.311Z] USER QUERY: How many runs were scored by Jadeja in 2024 in Test Matches
+SQL EXEC: SELECT SUM(d.runs_batter) 
+FROM deliveries d 
+JOIN matches m ON d.match_id = m.match_id 
+WHERE d.batter = 'Jadeja' 
+AND m.match_type = 'Test' 
+AND m.start_date LIKE '2024%';
+ERROR: None
+DB RESULTS: [{"sum":null}]
+----------------------------------------
+
+[2026-04-11T19:49:34.779Z] USER QUERY: How many runs were scored by Indian batter in 2024 in Test Matches
+SQL EXEC: SELECT SUM(d.runs_batter) 
+FROM deliveries d 
+JOIN innings i ON d.match_id = i.match_id AND d.innings_id = i.id 
+JOIN matches m ON d.match_id = m.match_id 
+WHERE i.team = 'India' AND m.match_type = 'Test' AND m.start_date LIKE '2024%';
+ERROR: None
+DB RESULTS: [{"sum":"7761"}]
+----------------------------------------
+
+[2026-04-11T19:49:57.695Z] USER QUERY: List Indian batter in 2024 in Test Matches
+SQL EXEC: SELECT DISTINCT d.batter 
+FROM deliveries d 
+JOIN innings i ON d.innings_id = i.id 
+JOIN matches m ON i.match_id = m.match_id 
+JOIN match_players mp ON m.match_id = mp.match_id AND d.batter = mp.player_name 
+WHERE m.match_type = 'Test' 
+AND m.season = '2024' 
+AND i.team = 'India';
+ERROR: None
+DB RESULTS: [{"batter":"DB Sharma"},{"batter":"H Kaur"},{"batter":"JI Rodrigues"},{"batter":"RM Ghosh"},{"batter":"S Mandhana"},{"batter":"S Shubha"},{"batter":"Shafali Verma"}]
+----------------------------------------
+
+[2026-04-11T19:50:41.515Z] USER QUERY: List Indian batter in 2024 in Test Matches and also list corresponding runs and do it for Men only
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs
+FROM deliveries d
+JOIN innings i ON d.innings_id = i.id
+JOIN matches m ON d.match_id = m.match_id
+JOIN match_players mp ON m.match_id = mp.match_id AND i.team = mp.team AND d.batter = mp.player_name
+JOIN players p ON mp.player_id = p.identifier
+WHERE m.match_type = 'Test'
+AND m.gender = 'Men'
+AND m.start_date LIKE '2024%'
+AND i.team = 'India'
+GROUP BY p.name;
+ERROR: None
+DB RESULTS: []
+----------------------------------------
+
+[2026-04-11T19:52:35.957Z] USER QUERY: List Indian batter in 2024 in Test Matches for Men's team
+SQL EXEC: SELECT DISTINCT p.name 
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN matches m ON mp.match_id = m.match_id
+JOIN innings i ON m.match_id = i.match_id
+WHERE m.match_type = 'Test'
+AND m.gender = 'Men'
+AND m.start_date LIKE '2024%'
+AND i.team = 'India'
+AND mp.team = 'India';
+ERROR: None
+DB RESULTS: []
+----------------------------------------
+
+[2026-04-11T19:53:03.066Z] USER QUERY: List Indian batter in 2024 in Test Matches for women team
+SQL EXEC: SELECT DISTINCT mp.player_name 
+FROM match_players mp 
+JOIN matches m ON mp.match_id = m.match_id 
+JOIN innings i ON m.match_id = i.match_id 
+JOIN deliveries d ON i.id = d.innings_id 
+WHERE m.match_type = 'Test' 
+AND m.gender = 'women' 
+AND m.start_date LIKE '2024%' 
+AND i.team = 'India' 
+AND mp.team = 'India' 
+AND mp.player_name = d.batter;
+ERROR: None
+DB RESULTS: []
+----------------------------------------
+
+[2026-04-11T19:53:24.427Z] USER QUERY: List Indian batter in 2024 for women team
+SQL EXEC: SELECT DISTINCT mp.player_name 
+FROM match_players mp
+JOIN matches m ON mp.match_id = m.match_id
+WHERE mp.team = 'India' 
+AND m.gender = 'women' 
+AND m.start_date LIKE '2024%' 
+AND EXISTS (
+    SELECT 1 
+    FROM deliveries d 
+    JOIN innings i ON d.innings_id = i.id 
+    WHERE i.team = 'India' 
+    AND d.batter = mp.player_name
+);
+ERROR: None
+DB RESULTS: []
+----------------------------------------
+
+[2026-04-11T19:53:39.394Z] USER QUERY: List Indian batter in 2023 for men team
+SQL EXEC: SELECT DISTINCT p.name 
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN matches m ON mp.match_id = m.match_id
+WHERE mp.team = 'India' 
+AND m.gender = 'men' 
+AND m.start_date LIKE '2023%' 
+AND EXISTS (
+    SELECT 1 
+    FROM deliveries d 
+    JOIN innings i ON d.innings_id = i.id 
+    WHERE d.batter = p.name 
+    AND i.match_id = m.match_id
+);
+ERROR: None
+DB RESULTS: []
+----------------------------------------
+
+[2026-04-11T19:53:54.488Z] USER QUERY: List Indian batter in 2021
+SQL EXEC: SELECT DISTINCT p.name 
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN matches m ON mp.match_id = m.match_id
+WHERE mp.team = 'India' AND m.start_date LIKE '2021%' AND mp.player_name IN (
+    SELECT DISTINCT batter 
+    FROM deliveries d
+    JOIN innings i ON d.innings_id = i.id
+    WHERE i.team = 'India'
+);
+ERROR: None
+DB RESULTS: [{"name":"AM Rahane"},{"name":"AR Patel"},{"name":"CA Pujara"},{"name":"DB Sharma"},{"name":"GH Vihari"},{"name":"H Kaur"},{"name":"I Sharma"},{"name":"J Goswami"},{"name":"J Yadav"},{"name":"JJ Bumrah"},{"name":"KL Rahul"},{"name":"Kuldeep Yadav"},{"name":"M Raj"},{"name":"MA Agarwal"},{"name":"Meghna Singh"},{"name":"Mohammed Shami"},{"name":"Mohammed Siraj"},{"name":"Navdeep Saini"},{"name":"P Vastrakar"},{"name":"PG Raut"},{"name":"R Ashwin"},{"name":"RA Jadeja"},{"name":"RG Sharma"},{"name":"RR Pant"},{"name":"RS Gayakwad"},{"name":"S Mandhana"},{"name":"S Nadeem"},{"name":"S Pandey"},{"name":"S Rana"},{"name":"Shafali Verma"},{"name":"Shubman Gill"},{"name":"SN Thakur"},{"name":"SS Iyer"},{"name":"T Bhatia"},{"name":"T Natarajan"},{"name":"UT Yadav"},{"name":"V Kohli"},{"name":"Washington Sundar"},{"name":"WP Saha"},{"name":"YH Bhatia"}]
+----------------------------------------
+
+[2026-04-11T19:54:07.948Z] USER QUERY: List 4 Indian batter in 2021
+SQL EXEC: SELECT p.name
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN matches m ON mp.match_id = m.match_id
+JOIN deliveries d ON m.match_id = d.match_id
+JOIN innings i ON d.innings_id = i.id
+WHERE i.team = 'India' AND m.start_date LIKE '2021%' AND d.batter = p.name
+GROUP BY p.name
+ORDER BY SUM(d.runs_batter) DESC
+LIMIT 4;
+ERROR: None
+DB RESULTS: [{"name":"RG Sharma"},{"name":"RR Pant"},{"name":"CA Pujara"},{"name":"V Kohli"}]
+----------------------------------------
+
+[2026-04-11T19:54:20.209Z] USER QUERY: List 4 Indian batter in 2020
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN deliveries d ON mp.player_name = d.batter
+JOIN innings i ON d.innings_id = i.id
+JOIN matches m ON i.match_id = m.match_id
+WHERE mp.team = 'India' AND m.start_date LIKE '2020%'
+GROUP BY p.name
+ORDER BY total_runs DESC
+LIMIT 4;
+ERROR: None
+DB RESULTS: [{"name":"AM Rahane","total_runs":"22848"},{"name":"CA Pujara","total_runs":"16626"},{"name":"V Kohli","total_runs":"14268"},{"name":"RA Jadeja","total_runs":"7216"}]
+----------------------------------------
+
+[2026-04-11T19:54:53.077Z] USER QUERY: List 4 Indian batter in 2019
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN deliveries d ON mp.player_name = d.batter
+JOIN matches m ON d.match_id = m.match_id
+WHERE mp.team = 'India' AND m.start_date LIKE '2019%'
+GROUP BY p.name
+ORDER BY total_runs DESC
+LIMIT 4;
+ERROR: None
+DB RESULTS: [{"name":"V Kohli","total_runs":"75276"},{"name":"AM Rahane","total_runs":"53928"},{"name":"CA Pujara","total_runs":"51714"},{"name":"RA Jadeja","total_runs":"38720"}]
+----------------------------------------
+
+[2026-04-11T19:55:20.057Z] USER QUERY: List 1 Indian batter in 2019
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS total_runs
+FROM players p
+JOIN match_players mp ON p.identifier = mp.player_id
+JOIN deliveries d ON mp.player_name = d.batter
+JOIN matches m ON d.match_id = m.match_id
+WHERE mp.team = 'India' AND m.start_date LIKE '2019%'
+GROUP BY p.name
+ORDER BY total_runs DESC
+LIMIT 1;
+ERROR: None
+DB RESULTS: [{"name":"V Kohli","total_runs":"75276"}]
+----------------------------------------
+
+[2026-04-18T00:11:41.646Z] USER QUERY: List the top 5 test batters with highest career runs
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS career_runs
+FROM players p
+JOIN deliveries d ON p.name = d.batter
+JOIN matches m ON d.match_id = m.match_id
+WHERE m.match_type = 'Test'
+GROUP BY p.name
+ORDER BY career_runs DESC
+LIMIT 5;
+ERROR: None
+DB RESULTS: [{"name":"JE Root","career_runs":"13943"},{"name":"AN Cook","career_runs":"12472"},{"name":"SPD Smith","career_runs":"10763"},{"name":"KS Williamson","career_runs":"9461"},{"name":"V Kohli","career_runs":"9230"}]
+----------------------------------------
+
+[2026-04-18T06:06:17.694Z] USER QUERY: List the top 5 test batters with highest career runs
+SQL EXEC: SELECT p.name, SUM(d.runs_batter) AS career_runs
+FROM players p
+JOIN deliveries d ON p.name = d.batter
+JOIN matches m ON d.match_id = m.match_id
+WHERE m.match_type = 'Test'
+GROUP BY p.name
+ORDER BY career_runs DESC
+LIMIT 5;
+ERROR: None
+DB RESULTS: [{"name":"JE Root","career_runs":"13943"},{"name":"AN Cook","career_runs":"12472"},{"name":"SPD Smith","career_runs":"10763"},{"name":"KS Williamson","career_runs":"9461"},{"name":"V Kohli","career_runs":"9230"}]
+----------------------------------------

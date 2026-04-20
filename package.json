@@ -1,0 +1,31 @@
+{
+  "name": "cricket_ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "autoprefixer": "^10.4.27",
+    "dotenv": "^17.4.1",
+    "lucide-react": "^0.378.0",
+    "next": "14.2.3",
+    "openai": "^4.44.0",
+    "pg": "^8.20.0",
+    "postcss": "^8.5.9",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "recharts": "^3.8.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "typescript": "6.0.2"
+  }
+}

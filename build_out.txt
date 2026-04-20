@@ -1,0 +1,15 @@
+
+> cricket_ui@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.3
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+Type error: Option 'moduleResolution=node10' is deprecated and will stop functioning in TypeScript 7.0. Specify compilerOption '"ignoreDeprecations": "6.0"' to silence this error.
+  Visit https://aka.ms/ts6 for migration information.
+

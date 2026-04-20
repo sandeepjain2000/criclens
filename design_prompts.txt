@@ -1,0 +1,282 @@
+How to use the prompts for AI review
+How to use the prompts for the AI review
+
+Use VSCODE copilot 
+Haiku 4.5 recommended for faster outputs
+
+1. Paste the prompt and attached the html file template from the drive
+2. Paste prompt it generates a html
+3. Continue pasting all prompts inside the same chat
+
+Give the first prompts, it will take time to analyse
+And then it will start creating files
+
+https://drive.google.com/drive/folders/16Ng81S61otAKCdNB_uY93brMT7icdZVM?usp=sharing
+1. Ui Unified design system evaluation
+Design evaluation/assessment prompts
+
+Objective: Check if the entire UI follows one consistent design system across all screens and components, but do not provide a solution redesign.
+
+Prompt 1:
+Unified Design System Evaluation
+Act as a senior UI/UX design auditor.
+Evaluate the wireframe only from a system consistency perspective.
+Do not redesign anything (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Focus only on:
+- Consistency of components (buttons, forms, tables)
+- Consistent styles (border radius, shadows, icons)
+- Interaction states (hover, active, disabled)
+- Reuse of patterns across screens
+Identify:
+- System-level inconsistencies
+- Pattern mismatches
+- Missing or broken design rules
+Do not comment on layout, usability, or content.
+Output Format (Strict):
+Structured table with:
+| # | Category | Sub-Category | Rating (1–10) | Key Issue | Impact | Area of Action | Real-World Example | URL | Critical (Yes/No) |
+Rules:
+Each major section must start with a section header row:
+--- SECTION NAME ---
+No design system docs unless unavoidable
+Keep findings specific, not generic
+
+
+
+
+2. Ui audit
+Objective: Check overall visual quality and cleanliness of the UI., but do not provide a solution redesign.
+
+Prompt 2:
+Act as a UI auditor.
+Evaluate the visual quality of the wireframe. Do not redesign (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Focus only on:
+- Typography usage (sizes, weights, hierarchy)
+- Visual consistency of UI elements
+- Alignment of elements (not grid system, just visual neatness)
+- Button and element clarity
+Identify:
+- Visual inconsistencies
+- Poor readability
+- Misaligned or cluttered UI
+Do not evaluate UX flows or deep layout structure.
+Output in a table:
+| Area | Issue | Impact | What Needs Attention |
+3. Ui Component Audit
+Objective: Check if individual components are built and used correctly. but do not provide a solution redesign.
+
+Prompt 3:
+Act as a Senior UI Component Auditor.
+Evaluate the wireframe strictly at a component level. Do not redesign (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Evaluation Scope
+Buttons
+- Size, padding, and alignment consistency
+- Variant usage (primary, secondary, ghost, etc.)
+- Consistency across similar actions
+- Disabled / loading states
+Form Elements
+- Inputs, dropdowns, checkboxes, radio buttons
+- Label alignment and spacing
+- Error states and validation behavior
+Cards & Containers
+- Header, body, footer consistency
+- Internal spacing and structure
+- Reusability of patterns
+Component States
+- Hover, focus, active, disabled
+- Missing or inconsistent states
+What to Identify
+- Incorrect component usage
+- Missing states
+- Inconsistent patterns
+- One-off or custom components breaking system
+Strict Boundaries
+- Do NOT evaluate layout structure
+- Do NOT evaluate UX flows
+- Do NOT evaluate typography system broadly
+Output Structure (Strict)
+Sections in Table:
+- Components—Buttons
+- Components—Forms
+- Components—Containers
+- Components—States
+
+
+4. Ux Layout & Structural Audit
+Objective: Check how well the screen layout is structured, spaced, and visually balanced, but do not provide a solution redesign.
+
+
+Prompt 4:
+
+Act as a Layout Auditor.
+Evaluate only layout and structure. Do not redesign (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Evaluation Scope
+Grid & Alignment
+- Column alignment
+- Edge alignment
+- Consistency across sections
+Spacing System
+- Vertical and horizontal spacing consistency
+- Padding and margins
+- Rhythm between sections
+Section Grouping
+- Logical grouping of related elements
+- Separation between sections
+- Clear start and end of sections
+Visual Balance
+- Distribution of content
+- Whitespace usage
+- Density (too crowded / too empty)
+Hierarchy
+- Clear primary vs secondary areas
+Flow of attention
+What to Identify
+- Misalignment
+- Inconsistent spacing
+- Poor grouping
+- Visual imbalance
+- Layout inefficiencies
+Strict Boundaries
+- Do NOT evaluate UI styling (colors, typography)
+- Do NOT evaluate UX flows
+- Do NOT evaluate component correctness
+Output Structure (Strict)
+Sections in Table:
+- Layout—Grid & Alignment
+- Layout—Spacing
+- Layout—Grouping
+- Layout—Balance & Density
+
+5. Ux Comprehensive UX Audit
+Objective: Check how easy and smooth it is for users to complete tasks
+Prompt 5:
+Act as a UX Auditor.
+Evaluate usability using real user flows. Do not redesign (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Evaluation Scope
+Navigation
+- Clarity of movement across screens
+- Predictability of actions
+- Visibility of options
+User Flows
+- Step-by-step task completion
+- Number of steps
+- Friction points
+Feedback & System Visibility
+- Loading states
+- Success / error feedback
+- System response clarity
+Error Handling
+- Prevention
+- Recovery
+- Clarity of messages
+Cognitive Load
+- Too many decisions
+- Confusing actions
+- Information overload
+What to Identify
+- Confusing flows
+- Missing feedback
+- Task friction
+- Dead ends
+- Unclear actions
+Strict Boundaries
+- Do NOT evaluate visual design quality
+- Do NOT evaluate layout spacing
+- Do NOT evaluate component styling
+Output Structure (Strict)
+Sections in Table:
+- UX — Navigation
+- UX — Task Flows
+- UX — Feedback
+- UX — Errors
+- UX — Cognitive Load
+Additional Instructions
+- Ratings must be justified in the “Key Findings” column.
+- “Areas of Action” should describe what needs improvement, not how to redesign it.
+- Real-world examples must be:
+  - Live websites or real digital interfaces (not design system documentation).
+  - Specifically relevant to school/education platforms.
+  - Include direct clickable URLs only (no placeholders).
+- Keep tone professional and analytical.
+- Avoid speculative assumptions beyond what is visible in the wireframe.
+- Highlight the Top 3 Critical Issues at the end in a short summary section.
+- If evaluating multiple wireframes, include:
+  - A comparative score summary table at the end.
+  - An overall performance rating for each prototype.
+
+6. Ux & Design System Evaluation Audit
+Objective: Check how well UX and design consistency work together across the entire product, but do not provide a solution redesign.
+
+Prompt 6:
+Act as a Product Design Auditor.
+Evaluate system-level experience across multiple screens. Do not redesign (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Evaluation Scope
+Cross-Screen Consistency
+- Same actions behaving the same everywhere
+- Consistent navigation patterns
+- Uniform interaction logic
+Pattern Reusability
+- Repeated UI patterns across flows
+- Avoidance of one-off solutions
+System Scalability
+- Can new features fit easily into the system?
+- Is the design modular?
+Accessibility Basics
+- Contrast
+- Click/tap targets
+- Readability
+UX + UI Alignment
+- Do design patterns support usability?
+- Any mismatch between UI and user expectations?
+What to Identify
+- System-level inconsistencies
+- Pattern breakdown across flows
+- Scalability issues
+- UX and UI misalignment
+Strict Boundaries
+- Do NOT go deep into individual components
+- Do NOT analyze spacing/layout details
+- Do NOT audit micro UI issues
+Output Structure (Strict)
+Sections in Table:
+- System — Cross-Screen Consistency
+- System — Patterns
+- System — Scalability
+- System — Accessibility
+- System — UX/UI Alignment
+
+
+7. Ux Labels, wording, typography, readability,
+Objective: Assess wireframe labels, wording, typography, readability, consistency, and grammar quality.
+
+Prompt 7:
+
+Evaluate the entire wireframe focusing on labels, wording, typography, and text quality across the interface (but do not provide a solution redesign).
+Analyse this codebase to validate my current wireframe against the above system consistency criteria and give me output in the following attached HTML format. The results must strictly reflect only the current wireframe.
+Assess the following:
+Label clarity
+- Are field names, section titles, and table headers clear and understandable?
+Terminology consistency
+- Are similar terms and actions used consistently across the interface?
+Typography hierarchy
+- Do headings, labels, and table headers follow a clear visual hierarchy?
+Readability
+- Are font sizes, spacing, and text density easy to read and scan?
+Button and action labels
+- Do buttons clearly communicate the intended action?
+Grammar and spelling
+- Identify any typos, incorrect capitalization, or grammatical issues.
+Provide the results in a table format with:
+| Category | Element / Label | Issue | Severity (Low / Medium / High) | Recommendation |
+Keep the evaluation strictly analytical and concise, without redesigning the interface.
+Gemini: WF correction prompt
+Wireframe correction prompt:
+
+Analyze the attached report and evaluate whether any structural, layout, hierarchy, or UI consistency updates are required in the current wireframe. If improvements are necessary, implement the revisions directly within the wireframe. Do not introduce or modify the existing color palette under any circumstances.
+
