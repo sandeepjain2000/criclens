@@ -124,7 +124,7 @@ Guidelines:
         let sqlResponse;
         try {
             sqlResponse = await openai.chat.completions.create({
-                model: "gpt-4o",
+                model: process.env.OPENAI_SQL_MODEL || "gpt-4o-mini",
                 messages: [{ role: "user", content: sqlPrompt }],
                 temperature: 0,
             });
@@ -173,7 +173,7 @@ FORMAT YOUR RESPONSE EXACTLY AS VALID JSON with keys:
 `;
 
         let synthResponse = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: process.env.OPENAI_EXPLAIN_MODEL || "gpt-4o-mini",
             messages: [{ role: "user", content: synthPrompt }],
             response_format: { type: "json_object" },
             temperature: 0.2,
