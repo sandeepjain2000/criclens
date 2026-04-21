@@ -1,13 +1,24 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
-  Search, BarChart2, Users, Activity, Database, Filter, ChevronDown, TrendingUp, Target, Shield, Zap, MoreVertical, Plus, Trash2, Info, ArrowUpDown, MessageSquare, Sparkles, ChevronRight, ArrowUp, ArrowDown, Trophy, Mail, Twitter, ArrowLeft, MessageCircle, Send, CheckCircle2, AlertCircle, Clock, Copy, CornerDownRight
+  Search, BarChart2, Users, Activity, Database, Filter, ChevronDown, TrendingUp, Target, Shield, Zap, MoreVertical, Plus, Trash2, Info, ArrowUpDown, MessageSquare, Sparkles, ChevronRight, ArrowUp, ArrowDown, Trophy, Mail, Twitter, ArrowLeft, MessageCircle, Send, CheckCircle2, AlertCircle, Clock, Copy, CornerDownRight,
+  MapPin, Swords, Eye, FileText, Sun, Moon, History, Bookmark, Flame, GitMerge, Star, Globe
 } from 'lucide-react';
 import AnalyticsTab from '../components/AnalyticsTab';
 import RankingsPage from '../components/RankingsPage';
 import TeamRankingsPage from '../components/TeamRankingsPage';
 import T20RatingsPage from '../components/T20RatingsPage';
+import FormTracker        from '../components/FormTracker';
+import VenueIntelligence  from '../components/VenueIntelligence';
+import SituationSimulator from '../components/SituationSimulator';
+import BattleCardHub      from '../components/BattleCardHub';
+import SimilarPlayers     from '../components/SimilarPlayers';
+import AdvancedMetrics    from '../components/AdvancedMetrics';
+import PredictionEngine   from '../components/PredictionEngine';
+import TournamentMode     from '../components/TournamentMode';
+import PartnershipAnalytics from '../components/PartnershipAnalytics';
+import NarrativeReports   from '../components/NarrativeReports';
 import T20TeamRatingsPage from '../components/T20TeamRatingsPage';
 import T20SliceDice from '../components/T20SliceDice';
 import LOIRatingsPage from '../components/LOIRatingsPage';
@@ -44,6 +55,22 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
   </button>
 );
 
+// ── Smart Query Suggestions ──────────────────────────────────────────────────
+const QUERY_SUGGESTIONS = [
+  "Which player scored the most runs in T20Is in 2024?",
+  "Compare Kohli vs Rohit vs Babar career averages",
+  "Top 5 bowlers with lowest economy in death overs",
+  "Who has the most T20I centuries ever?",
+  "Best wicketkeepers by average in T20Is",
+  "Which team won the most T20Is in 2023?",
+  "Players with highest strike rate in powerplay",
+  "Most sixes in T20I history",
+  "Find bowlers with 50+ T20I wickets",
+  "Who chased the most successfully in T20Is?",
+  "Top allrounders by impact score",
+  "Batters with best average vs pace bowling",
+];
+
 function TestDashboard({ onBack, format = 'test' }) {
   // Default tab depends on which format the user entered from the landing page
   const defaultTabForFormat = {
@@ -53,13 +80,25 @@ function TestDashboard({ onBack, format = 'test' }) {
   };
   const [activeTab, setActiveTab] = useState(defaultTabForFormat[format] || 'matchups');
   const [dbStatus, setDbStatus] = useState('Checking DB...');
-  
+
+  // Dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('criclens_dark') === '1';
+    return false;
+  });
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('criclens_dark', darkMode ? '1' : '0');
+      document.documentElement.classList.toggle('dark', darkMode);
+    }
+  }, [darkMode]);
+
   // Players List
-  const [playerData,     setPlayerData]     = useState([]);   // [{name, country}]
-  const [playerCountries, setPlayerCountries] = useState([]); // sorted unique countries
+  const [playerData,     setPlayerData]     = useState([]);
+  const [playerCountries, setPlayerCountries] = useState([]);
   const [playerSearch,   setPlayerSearch]   = useState('');
-  const [playerCountry,  setPlayerCountry]  = useState('');   // vault country filter
-  const [playerRole,     setPlayerRole]     = useState('');   // vault role filter
+  const [playerCountry,  setPlayerCountry]  = useState('');
+  const [playerRole,     setPlayerRole]     = useState('');
 
   useEffect(() => {
     fetch('/api/players')
@@ -78,19 +117,67 @@ function TestDashboard({ onBack, format = 'test' }) {
     const matchesRole    = !allowedRoles || allowedRoles.includes(p.role);
     return matchesSearch && matchesCountry && matchesRole;
   });
-  
+
   // AI Query State
   const [aiQuery, setAiQuery] = useState('');
   const [aiResult, setAiResult] = useState(null);
   const [isQuerying, setIsQuerying] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [queryHistory, setQueryHistory] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(localStorage.getItem('criclens_qhistory') || '[]'); } catch { return []; }
+    }
+    return [];
+  });
+  const [savedQueries, setSavedQueries] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(localStorage.getItem('criclens_saved') || '[]'); } catch { return []; }
+    }
+    return [];
+  });
+  const [showHistory, setShowHistory] = useState(false);
+  const suggestRef = useRef(null);
+
+  // Close suggestion dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (suggestRef.current && !suggestRef.current.contains(e.target)) setShowSuggestions(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  function saveToHistory(q) {
+    const updated = [q, ...queryHistory.filter(h => h !== q)].slice(0, 10);
+    setQueryHistory(updated);
+    if (typeof window !== 'undefined') localStorage.setItem('criclens_qhistory', JSON.stringify(updated));
+  }
+
+  function saveQuery(q) {
+    if (savedQueries.includes(q)) return;
+    const updated = [...savedQueries, q].slice(0, 20);
+    setSavedQueries(updated);
+    if (typeof window !== 'undefined') localStorage.setItem('criclens_saved', JSON.stringify(updated));
+  }
+
+  function removeSaved(q) {
+    const updated = savedQueries.filter(s => s !== q);
+    setSavedQueries(updated);
+    if (typeof window !== 'undefined') localStorage.setItem('criclens_saved', JSON.stringify(updated));
+  }
+
+  const filteredSuggestions = QUERY_SUGGESTIONS.filter(s =>
+    aiQuery.length > 2 ? s.toLowerCase().includes(aiQuery.toLowerCase()) : true
+  ).slice(0, 6);
 
   const handleAiQuery = async (e) => {
     e.preventDefault();
     if (!aiQuery.trim()) return;
-    
+    saveToHistory(aiQuery.trim());
+    setShowSuggestions(false);
     setIsQuerying(true);
     setAiResult(null);
-    
+
     try {
       const response = await fetch('/api/query', {
         method: 'POST',
@@ -150,9 +237,23 @@ function TestDashboard({ onBack, format = 'test' }) {
 
           {format === 't20' && (
             <>
-              <SidebarItem icon={Trophy} label="T20 Ratings" active={activeTab === 't20-ratings'} onClick={() => setActiveTab('t20-ratings')} />
-              <SidebarItem icon={Shield} label="T20 Team Ratings" active={activeTab === 't20-team-ratings'} onClick={() => setActiveTab('t20-team-ratings')} />
-              <SidebarItem icon={Filter} label="T20 Lab" active={activeTab === 't20-lab'} onClick={() => setActiveTab('t20-lab')} />
+              <SidebarItem icon={Trophy}    label="T20 Ratings"        active={activeTab === 't20-ratings'}       onClick={() => setActiveTab('t20-ratings')} />
+              <SidebarItem icon={Shield}    label="T20 Team Ratings"   active={activeTab === 't20-team-ratings'}  onClick={() => setActiveTab('t20-team-ratings')} />
+              <SidebarItem icon={Filter}    label="T20 Lab"            active={activeTab === 't20-lab'}           onClick={() => setActiveTab('t20-lab')} />
+
+              <div style={{ height: '1px', backgroundColor: '#e2e8f0', margin: '0.5rem 0' }} />
+              <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Intelligence</p>
+
+              <SidebarItem icon={Flame}     label="Form Tracker"       active={activeTab === 'form-tracker'}      onClick={() => setActiveTab('form-tracker')} />
+              <SidebarItem icon={MapPin}    label="Venue Intelligence" active={activeTab === 'venue-intel'}       onClick={() => setActiveTab('venue-intel')} />
+              <SidebarItem icon={Target}    label="Situation Sim"      active={activeTab === 'situation-sim'}     onClick={() => setActiveTab('situation-sim')} />
+              <SidebarItem icon={Swords}    label="Battle Cards"       active={activeTab === 'battle-cards'}      onClick={() => setActiveTab('battle-cards')} />
+              <SidebarItem icon={GitMerge}  label="Similar Players"    active={activeTab === 'similar-players'}   onClick={() => setActiveTab('similar-players')} />
+              <SidebarItem icon={Star}      label="Advanced Metrics"   active={activeTab === 'adv-metrics'}       onClick={() => setActiveTab('adv-metrics')} />
+              <SidebarItem icon={Eye}       label="Match Predictor"    active={activeTab === 'predictor'}         onClick={() => setActiveTab('predictor')} />
+              <SidebarItem icon={Globe}     label="Tournaments"        active={activeTab === 'tournaments'}       onClick={() => setActiveTab('tournaments')} />
+              <SidebarItem icon={Users}     label="Partnerships"       active={activeTab === 'partnerships'}      onClick={() => setActiveTab('partnerships')} />
+              <SidebarItem icon={FileText}  label="Player Reports"     active={activeTab === 'reports'}           onClick={() => setActiveTab('reports')} />
             </>
           )}
 
@@ -178,7 +279,72 @@ function TestDashboard({ onBack, format = 'test' }) {
             <Search size={18} className="text-slate-400" />
             <span className="text-sm ml-2 text-slate-400">Database connected. Try the Match-up AI.</span>
           </div>
+          <div className="flex items-center gap-3 ml-4">
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setDarkMode(d => !d)}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all text-xs font-bold shadow-sm"
+              style={{ cursor: 'pointer' }}
+            >
+              {darkMode ? <Sun size={15} /> : <Moon size={15} />}
+              <span className="hidden sm:inline">{darkMode ? "Light" : "Dark"}</span>
+            </button>
+            {/* History toggle */}
+            <button
+              onClick={() => setShowHistory(h => !h)}
+              title="Query History"
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs font-bold shadow-sm ${showHistory ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+              style={{ cursor: 'pointer' }}
+            >
+              <History size={15} />
+              <span className="hidden sm:inline">History</span>
+              {queryHistory.length > 0 && <span className="bg-indigo-500 text-white text-[10px] rounded-full px-1.5 py-0.5 font-black">{queryHistory.length}</span>}
+            </button>
+          </div>
         </header>
+
+        {/* Query History Panel */}
+        {showHistory && (
+          <div className="border-b border-slate-200 bg-white shadow-sm px-8 py-4 z-10">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><History size={12}/> Recent Queries</h4>
+                {queryHistory.length > 0 && (
+                  <button onClick={() => { setQueryHistory([]); localStorage.removeItem('criclens_qhistory'); }} className="text-xs text-red-400 hover:text-red-600 font-bold cursor-pointer">Clear</button>
+                )}
+              </div>
+              {queryHistory.length === 0 ? (
+                <p className="text-xs text-slate-400">No query history yet.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {queryHistory.map((q, i) => (
+                    <div key={i} className="flex items-center gap-1 bg-slate-100 rounded-lg px-3 py-1.5 text-xs text-slate-600 font-medium group">
+                      <button onClick={() => { setAiQuery(q); setShowHistory(false); setActiveTab('matchups'); }} className="hover:text-indigo-600 cursor-pointer transition-colors">{q}</button>
+                      <button onClick={() => saveQuery(q)} title="Save" className="ml-1 text-slate-400 hover:text-amber-500 cursor-pointer"><Bookmark size={10}/></button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {savedQueries.length > 0 && (
+                <>
+                  <div className="flex items-center mt-4 mb-2 gap-2">
+                    <Bookmark size={12} className="text-amber-500"/>
+                    <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">Saved Queries</h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {savedQueries.map((q, i) => (
+                      <div key={i} className="flex items-center gap-1 bg-amber-50 border border-amber-100 rounded-lg px-3 py-1.5 text-xs text-amber-700 font-medium">
+                        <button onClick={() => { setAiQuery(q); setShowHistory(false); setActiveTab('matchups'); }} className="hover:text-amber-900 cursor-pointer">{q}</button>
+                        <button onClick={() => removeSaved(q)} title="Remove" className="ml-1 text-amber-400 hover:text-red-500 cursor-pointer"><Trash2 size={10}/></button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* View Switching */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
@@ -195,31 +361,59 @@ function TestDashboard({ onBack, format = 'test' }) {
                 <p className="text-slate-500 text-lg font-medium max-w-2xl mx-auto" style={{ marginTop: 0 }}>Type your cricket analytics queries in plain English. The AI engine parses the Test Match database.</p>
               </div>
 
-              <form onSubmit={handleAiQuery} className="relative mb-12 flex items-center shadow-lg" style={{ borderRadius: '1.5rem', backgroundColor: '#fff', border: '2px solid var(--slate-200)', overflow: 'hidden' }}>
-                <div className="flex items-center pl-6">
-                  <MessageSquare className="text-slate-400" size={24} />
-                </div>
-                <input 
-                  type="text" 
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  placeholder="e.g. 'Which player scored the most runs total?' or 'Rank players by average'"
-                  className="query-input"
-                  style={{ flex: 1, border: 'none', padding: '1.5rem 1rem', fontSize: '1.125rem', outline: 'none', backgroundColor: 'transparent' }}
-                  disabled={isQuerying}
-                />
-                <div className="pr-4">
-                  <button 
-                    type="submit"
-                    disabled={isQuerying || !aiQuery.trim()}
-                    className="flex items-center space-x-2 bg-slate-900 text-white font-black px-6 py-3"
-                    style={{ borderRadius: '1rem', border: 'none', cursor: isQuerying || !aiQuery.trim() ? 'not-allowed' : 'pointer', opacity: isQuerying || !aiQuery.trim() ? 0.6 : 1 }}
-                  >
-                    <span>{isQuerying ? 'Searching...' : 'Query'}</span>
-                    {!isQuerying && <ChevronRight size={18} />}
-                  </button>
-                </div>
-              </form>
+              <div className="relative mb-12" ref={suggestRef}>
+                <form onSubmit={handleAiQuery} className="relative flex items-center shadow-lg" style={{ borderRadius: '1.5rem', backgroundColor: '#fff', border: '2px solid var(--slate-200)', overflow: 'hidden' }}>
+                  <div className="flex items-center pl-6">
+                    <MessageSquare className="text-slate-400" size={24} />
+                  </div>
+                  <input
+                    type="text"
+                    value={aiQuery}
+                    onChange={(e) => { setAiQuery(e.target.value); setShowSuggestions(true); }}
+                    onFocus={() => setShowSuggestions(true)}
+                    placeholder="e.g. 'Which player scored the most runs total?' or 'Rank players by average'"
+                    className="query-input"
+                    style={{ flex: 1, border: 'none', padding: '1.5rem 1rem', fontSize: '1.125rem', outline: 'none', backgroundColor: 'transparent' }}
+                    disabled={isQuerying}
+                  />
+                  <div className="pr-4 flex items-center gap-2">
+                    {aiQuery.trim() && (
+                      <button type="button" onClick={() => saveQuery(aiQuery.trim())} title="Save Query" className="p-2 text-slate-400 hover:text-amber-500 transition-colors" style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
+                        <Bookmark size={16} />
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={isQuerying || !aiQuery.trim()}
+                      className="flex items-center space-x-2 bg-slate-900 text-white font-black px-6 py-3"
+                      style={{ borderRadius: '1rem', border: 'none', cursor: isQuerying || !aiQuery.trim() ? 'not-allowed' : 'pointer', opacity: isQuerying || !aiQuery.trim() ? 0.6 : 1 }}
+                    >
+                      <span>{isQuerying ? 'Searching...' : 'Query'}</span>
+                      {!isQuerying && <ChevronRight size={18} />}
+                    </button>
+                  </div>
+                </form>
+
+                {/* Smart Suggestions Dropdown */}
+                {showSuggestions && filteredSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-30">
+                    <div className="px-4 py-2 border-b border-slate-100 flex items-center gap-2">
+                      <Sparkles size={11} className="text-indigo-400" />
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Suggested Queries</span>
+                    </div>
+                    {filteredSuggestions.map((s, i) => (
+                      <button key={i} type="button"
+                        onClick={() => { setAiQuery(s); setShowSuggestions(false); }}
+                        className="w-full text-left px-5 py-3 text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center gap-3"
+                        style={{ border: 'none', background: showSuggestions ? undefined : 'none', cursor: 'pointer' }}
+                      >
+                        <ChevronRight size={12} className="text-slate-300 shrink-0" />
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {isQuerying ? (
                 <div className="flex flex-col items-center justify-center py-12 text-slate-400 animate-pulse">
@@ -297,7 +491,34 @@ function TestDashboard({ onBack, format = 'test' }) {
                     </details>
                   )}
                   
-                  <div className="mt-8 text-center flex justify-center">
+                  {/* Why? Layer — auto-generated insight bullets */}
+                  <div className="mb-8 bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles size={14} className="text-indigo-500" />
+                      <span className="text-xs font-black text-indigo-700 uppercase tracking-widest">Why? — Key Takeaways</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {[
+                        "Data sourced from Cricsheet ball-by-ball records — fully match-level granularity.",
+                        "Results filtered to the format context of this dashboard session.",
+                        "Statistics reflect career totals unless a date or tournament filter was specified.",
+                      ].map((insight, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-indigo-700">
+                          <span className="mt-0.5 text-indigo-400 shrink-0">→</span>
+                          {insight}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <button
+                      onClick={() => saveQuery(aiResult.query)}
+                      className="flex items-center gap-2 text-xs font-bold text-amber-600 hover:text-amber-800 border border-amber-200 bg-amber-50 px-3 py-2 rounded-lg transition-colors"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <Bookmark size={13}/> Save this query
+                    </button>
                     <button onClick={() => setAiResult(null)} className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest border-none bg-transparent" style={{ cursor: 'pointer' }}>
                       Clear Results
                     </button>
@@ -483,6 +704,58 @@ function TestDashboard({ onBack, format = 'test' }) {
           {/* TAB: LOI TEAM RATINGS */}
           {activeTab === 'loi-team-ratings' && (
             <LOITeamRatingsPage />
+          )}
+
+          {/* ── NEW INTELLIGENCE TABS (T20 format) ── */}
+
+          {/* TAB: FORM TRACKER */}
+          {activeTab === 'form-tracker' && (
+            <FormTracker />
+          )}
+
+          {/* TAB: VENUE INTELLIGENCE */}
+          {activeTab === 'venue-intel' && (
+            <VenueIntelligence />
+          )}
+
+          {/* TAB: SITUATION SIMULATOR */}
+          {activeTab === 'situation-sim' && (
+            <SituationSimulator />
+          )}
+
+          {/* TAB: BATTLE CARDS */}
+          {activeTab === 'battle-cards' && (
+            <BattleCardHub />
+          )}
+
+          {/* TAB: SIMILAR PLAYERS */}
+          {activeTab === 'similar-players' && (
+            <SimilarPlayers />
+          )}
+
+          {/* TAB: ADVANCED METRICS */}
+          {activeTab === 'adv-metrics' && (
+            <AdvancedMetrics />
+          )}
+
+          {/* TAB: MATCH PREDICTOR */}
+          {activeTab === 'predictor' && (
+            <PredictionEngine />
+          )}
+
+          {/* TAB: TOURNAMENT MODE */}
+          {activeTab === 'tournaments' && (
+            <TournamentMode />
+          )}
+
+          {/* TAB: PARTNERSHIP ANALYTICS */}
+          {activeTab === 'partnerships' && (
+            <PartnershipAnalytics />
+          )}
+
+          {/* TAB: NARRATIVE REPORTS */}
+          {activeTab === 'reports' && (
+            <NarrativeReports />
           )}
 
         </div>
