@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, BarChart2, Users, Activity, Database, Filter, ChevronDown, TrendingUp, Target, Shield, Zap, MoreVertical, Plus, Trash2, Info, ArrowUpDown, MessageSquare, Sparkles, ChevronRight, ArrowUp, ArrowDown, Trophy, Mail, Twitter, ArrowLeft, MessageCircle, Send, CheckCircle2, AlertCircle, Clock, Copy, CornerDownRight,
-  MapPin, Swords, Eye, FileText, Sun, Moon, History, Bookmark, Flame, GitMerge, Star, Globe
+  MapPin, Swords, Eye, FileText, Sun, Moon, History, Bookmark, Flame, GitMerge, Star, Globe, UserCheck
 } from 'lucide-react';
 import AnalyticsTab from '../components/AnalyticsTab';
 import RankingsPage from '../components/RankingsPage';
@@ -19,6 +19,7 @@ import PredictionEngine   from '../components/PredictionEngine';
 import TournamentMode     from '../components/TournamentMode';
 import PartnershipAnalytics from '../components/PartnershipAnalytics';
 import NarrativeReports   from '../components/NarrativeReports';
+import TeamSelector        from '../components/TeamSelector';
 import T20TeamRatingsPage from '../components/T20TeamRatingsPage';
 import T20SliceDice from '../components/T20SliceDice';
 import LOIRatingsPage from '../components/LOIRatingsPage';
@@ -254,6 +255,7 @@ function TestDashboard({ onBack, format = 'test' }) {
               <SidebarItem icon={Globe}     label="Tournaments"        active={activeTab === 'tournaments'}       onClick={() => setActiveTab('tournaments')} />
               <SidebarItem icon={Users}     label="Partnerships"       active={activeTab === 'partnerships'}      onClick={() => setActiveTab('partnerships')} />
               <SidebarItem icon={FileText}  label="Player Reports"     active={activeTab === 'reports'}           onClick={() => setActiveTab('reports')} />
+              <SidebarItem icon={UserCheck} label="Team Selector"      active={activeTab === 'team-selector'}     onClick={() => setActiveTab('team-selector')} />
             </>
           )}
 
@@ -756,6 +758,11 @@ function TestDashboard({ onBack, format = 'test' }) {
           {/* TAB: NARRATIVE REPORTS */}
           {activeTab === 'reports' && (
             <NarrativeReports />
+          )}
+
+          {/* TAB: TEAM SELECTOR */}
+          {activeTab === 'team-selector' && (
+            <TeamSelector />
           )}
 
         </div>
