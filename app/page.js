@@ -1015,7 +1015,7 @@ function LandingPage({ onSelectFormat }) {
       {/* Captcha Modal Overlay */}
       {showCaptcha && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 w-full max-w-xs animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6" style={{ width: '100%', maxWidth: '300px' }}>
             <div className="flex items-center justify-center mb-3">
               <Shield size={26} className="text-emerald-500" />
             </div>
