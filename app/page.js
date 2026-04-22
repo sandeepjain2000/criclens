@@ -222,9 +222,10 @@ function TestDashboard({ onBack, format = 'test' }) {
         </button>
 
         <nav className="flex-1 space-y-2 flex flex-col">
-          <SidebarItem icon={Zap} label="Match-Up AI" active={activeTab === 'matchups'} onClick={() => setActiveTab('matchups')} />
-          <SidebarItem icon={Database} label="Player Vault" active={activeTab === 'vault'} onClick={() => setActiveTab('vault')} />
-          <SidebarItem icon={BarChart2} label="Analytics Hub" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+          <SidebarItem icon={Zap}       label="Match-Up AI"    active={activeTab === 'matchups'}       onClick={() => setActiveTab('matchups')} />
+          <SidebarItem icon={Database}  label="Player Vault"   active={activeTab === 'vault'}          onClick={() => setActiveTab('vault')} />
+          <SidebarItem icon={BarChart2} label="Analytics Hub"  active={activeTab === 'analytics'}      onClick={() => setActiveTab('analytics')} />
+          <SidebarItem icon={UserCheck} label="Team Selector"  active={activeTab === 'team-selector'}  onClick={() => setActiveTab('team-selector')} />
 
           <div style={{ height: '1px', backgroundColor: '#e2e8f0', margin: '0.75rem 0' }} />
 
@@ -255,7 +256,6 @@ function TestDashboard({ onBack, format = 'test' }) {
               <SidebarItem icon={Globe}     label="Tournaments"        active={activeTab === 'tournaments'}       onClick={() => setActiveTab('tournaments')} />
               <SidebarItem icon={Users}     label="Partnerships"       active={activeTab === 'partnerships'}      onClick={() => setActiveTab('partnerships')} />
               <SidebarItem icon={FileText}  label="Player Reports"     active={activeTab === 'reports'}           onClick={() => setActiveTab('reports')} />
-              <SidebarItem icon={UserCheck} label="Team Selector"      active={activeTab === 'team-selector'}     onClick={() => setActiveTab('team-selector')} />
             </>
           )}
 
@@ -1015,40 +1015,40 @@ function LandingPage({ onSelectFormat }) {
       {/* Captcha Modal Overlay */}
       {showCaptcha && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8 w-full max-w-sm animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-center mb-4">
-              <Shield size={32} className="text-emerald-500" />
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 w-full max-w-xs animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-center mb-3">
+              <Shield size={26} className="text-emerald-500" />
             </div>
-            <h3 className="text-xl font-black text-center text-slate-800 mb-2">Security Verification</h3>
-            <p className="text-sm text-center text-slate-500 mb-6">Please solve the math puzzle to enter the Dashboard.</p>
-            
-            <form onSubmit={submitCaptcha} className="flex flex-col gap-4">
-              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center">
-                <span className="text-2xl font-black text-slate-700 tracking-widest">{captchaQuestion}</span>
+            <h3 className="text-base font-black text-center text-slate-800 mb-1">Security Verification</h3>
+            <p className="text-xs text-center text-slate-500 mb-4">Solve the puzzle to enter the Dashboard.</p>
+
+            <form onSubmit={submitCaptcha} className="flex flex-col gap-3">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-center">
+                <span className="text-xl font-black text-slate-700 tracking-widest">{captchaQuestion}</span>
               </div>
               <div>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={captchaAns}
                   onChange={e => { setCaptchaAns(e.target.value); setCaptchaError(false); }}
                   placeholder="Your answer"
-                  className={`w-full outline-none border ${captchaError ? 'border-red-400 bg-red-50' : 'border-slate-300'} rounded-xl px-4 py-3 text-lg text-center font-bold focus:border-emerald-500 transition-colors`}
+                  className={`w-full outline-none border ${captchaError ? 'border-red-400 bg-red-50' : 'border-slate-300'} rounded-lg px-3 py-2.5 text-base text-center font-bold focus:border-emerald-500 transition-colors`}
                   autoFocus
                   required
                 />
-                {captchaError && <p className="text-xs text-red-500 mt-2 text-center font-bold">Incorrect answer. Please try again.</p>}
+                {captchaError && <p className="text-xs text-red-500 mt-1.5 text-center font-bold">Incorrect answer. Try again.</p>}
               </div>
-              <div className="flex gap-2 mt-2">
-                <button 
-                  type="button" 
+              <div className="flex gap-2">
+                <button
+                  type="button"
                   onClick={() => setShowCaptcha(false)}
-                  className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
-                  className="flex-1 px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors cursor-pointer shadow-sm"
+                  className="flex-1 px-3 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition-colors cursor-pointer shadow-sm"
                 >
                   Verify
                 </button>
