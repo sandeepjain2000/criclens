@@ -2,19 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Swords, Download, Share2, ChevronDown, Trophy } from 'lucide-react';
 
-const PLAYERS = {
-  "Virat Kohli":      { country:"India",   flag:"🇮🇳", role:"BAT", sr:139, avg:51.1, runs:4188, innings:131, fifties:38, centuries:1,  phase:{pp:122,mid:138,death:148}, vs:{pace:144,spin:132}},
-  "Rohit Sharma":     { country:"India",   flag:"🇮🇳", role:"BAT", sr:140, avg:32.5, runs:4231, innings:148, fifties:30, centuries:4,  phase:{pp:148,mid:135,death:142}, vs:{pace:142,spin:137}},
-  "Suryakumar Yadav": { country:"India",   flag:"🇮🇳", role:"BAT", sr:171, avg:47.4, runs:3874, innings:97,  fifties:28, centuries:4,  phase:{pp:155,mid:174,death:195}, vs:{pace:168,spin:175}},
-  "Babar Azam":       { country:"Pakistan",flag:"🇵🇰", role:"BAT", sr:130, avg:43.8, runs:4003, innings:108, fifties:34, centuries:3,  phase:{pp:121,mid:132,death:138}, vs:{pace:132,spin:127}},
-  "Jos Buttler":      { country:"England", flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", role:"WK",  sr:148, avg:36.5, runs:3282, innings:104, fifties:26, centuries:7,  phase:{pp:162,mid:142,death:168}, vs:{pace:152,spin:142}},
-  "Mohammad Rizwan":  { country:"Pakistan",flag:"🇵🇰", role:"WK",  sr:128, avg:42.2, runs:3590, innings:98,  fifties:35, centuries:2,  phase:{pp:118,mid:132,death:135}, vs:{pace:130,spin:125}},
-  "Glenn Maxwell":    { country:"Australia",flag:"🇦🇺",role:"AR",  sr:158, avg:28.5, runs:2574, innings:108, fifties:18, centuries:3,  phase:{pp:148,mid:155,death:188}, vs:{pace:155,spin:162}},
-  "Hardik Pandya":    { country:"India",   flag:"🇮🇳", role:"AR",  sr:147, avg:27.1, runs:1820, innings:78,  fifties:11, centuries:0,  phase:{pp:130,mid:145,death:178}, vs:{pace:148,spin:145}},
-  "KL Rahul":         { country:"India",   flag:"🇮🇳", role:"WK",  sr:136, avg:34.2, runs:2476, innings:83,  fifties:22, centuries:1,  phase:{pp:145,mid:132,death:138}, vs:{pace:138,spin:132}},
-};
-
-const PLAYER_LIST = Object.keys(PLAYERS);
+// Player data loaded dynamically from API
 
 function CompareBar({ label, v1, v2, max, p1Color = "#10b981", p2Color = "#6366f1" }) {
   const pct1 = Math.round((v1 / max) * 100);
@@ -36,13 +24,45 @@ function CompareBar({ label, v1, v2, max, p1Color = "#10b981", p2Color = "#6366f
 }
 
 export default function BattleCardHub() {
-  const [p1Name, setP1Name] = useState("Virat Kohli");
-  const [p2Name, setP2Name] = useState("Suryakumar Yadav");
+  const [playerList, setPlayerList] = useState([]);
+  const [p1Name, setP1Name] = useState("");
+  const [p2Name, setP2Name] = useState("");
+  const [p1, setP1] = useState(null);
+  const [p2, setP2] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [comparing, setComparing] = useState(false);
   const [copied, setCopied] = useState(false);
   const cardRef = useRef(null);
 
-  const p1 = PLAYERS[p1Name];
-  const p2 = PLAYERS[p2Name];
+  // Load player list on mount
+  React.useEffect(() => {
+    fetch('/api/t20/battle-cards?action=players')
+      .then(r => r.json())
+      .then(d => {
+        const list = d.players || [];
+        setPlayerList(list);
+        if (list.length >= 2) {
+          setP1Name(list[0].name);
+          setP2Name(list[1].name);
+        }
+        setLoading(false);
+      })
+      .catch(e => { console.error(e); setLoading(false); });
+  }, []);
+
+  // Compare when names change
+  React.useEffect(() => {
+    if (!p1Name || !p2Name) return;
+    setComparing(true);
+    fetch(`/api/t20/battle-cards?action=compare&p1=${encodeURIComponent(p1Name)}&p2=${encodeURIComponent(p2Name)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.p1) setP1(d.p1);
+        if (d.p2) setP2(d.p2);
+        setComparing(false);
+      })
+      .catch(e => { console.error(e); setComparing(false); });
+  }, [p1Name, p2Name]);
 
   const metrics = [
     {label:"Strike Rate", k:"sr",     max:220},
@@ -51,6 +71,26 @@ export default function BattleCardHub() {
     {label:"50s",         k:"fifties",max:45 },
     {label:"100s",        k:"centuries",max:10},
   ];
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto py-8 px-2">
+        <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+          Loading Battle Cards engine...
+        </div>
+      </div>
+    );
+  }
+
+  if (!p1 || !p2) {
+    return (
+      <div className="max-w-4xl mx-auto py-8 px-2">
+        <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest text-xs">
+          {comparing ? <span className="animate-pulse">Loading comparison...</span> : "Select two players to compare"}
+        </div>
+      </div>
+    );
+  }
 
   function getHeadline() {
     const wins = { [p1Name]: 0, [p2Name]: 0 };
@@ -79,7 +119,7 @@ export default function BattleCardHub() {
     <div className="relative">
       <select value={value} onChange={e=>onChange(e.target.value)}
         className="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-8 text-sm font-black text-slate-700 shadow-sm focus:outline-none focus:border-emerald-400 cursor-pointer max-w-[180px]">
-        {PLAYER_LIST.filter(p=>p!==exclude).map(p=><option key={p}>{p}</option>)}
+        {playerList.filter(p=>p.name!==exclude).map(p=><option key={p.name} value={p.name}>{p.name}</option>)}
       </select>
       <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
     </div>
@@ -120,7 +160,7 @@ export default function BattleCardHub() {
         <div className="bg-gradient-to-r from-emerald-600 via-slate-800 to-indigo-600 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="text-center">
-              <div className="text-3xl mb-1">{p1.flag}</div>
+              <div className="text-3xl mb-1">🏆</div>
               <div className="font-black text-xl">{p1Name.split(" ").pop()}</div>
               <div className="text-xs text-white/70 font-bold">{p1.country} · {p1.role}</div>
             </div>
@@ -129,7 +169,7 @@ export default function BattleCardHub() {
               <span className="text-xs font-black uppercase tracking-widest text-white/60">T20I</span>
             </div>
             <div className="text-center">
-              <div className="text-3xl mb-1">{p2.flag}</div>
+              <div className="text-3xl mb-1">🏆</div>
               <div className="font-black text-xl">{p2Name.split(" ").pop()}</div>
               <div className="text-xs text-white/70 font-bold">{p2.country} · {p2.role}</div>
             </div>

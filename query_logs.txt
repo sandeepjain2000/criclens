@@ -333,3 +333,75 @@ LIMIT 5;
 ERROR: None
 DB RESULTS: [{"name":"JE Root","career_runs":"13943"},{"name":"AN Cook","career_runs":"12472"},{"name":"SPD Smith","career_runs":"10763"},{"name":"KS Williamson","career_runs":"9461"},{"name":"V Kohli","career_runs":"9230"}]
 ----------------------------------------
+
+[2026-04-23T05:48:41.266Z] USER QUERY: SELECT DISTINCT mp.team FROM match_players mp WHERE mp.player_name IN ('Deepti Sharma','Renuka Singh','P Vastrakar','RP Yadav') LIMIT 20
+SQL EXEC: SELECT DISTINCT mp.team FROM match_players mp WHERE mp.player_name IN ('Deepti Sharma', 'Renuka Singh', 'P Vastrakar', 'RP Yadav') LIMIT 20;
+ERROR: None
+DB RESULTS: [{"team":"India"}]
+----------------------------------------
+
+[2026-04-23T05:55:59.306Z] USER QUERY: SELECT DISTINCT mp.team FROM match_players mp WHERE mp.player_name IN ('Deepti Sharma','Renuka Singh','P Vastrakar','RP Yadav') LIMIT 20
+SQL EXEC: SELECT DISTINCT mp.team FROM match_players mp WHERE mp.player_name IN ('Deepti Sharma', 'Renuka Singh', 'P Vastrakar', 'RP Yadav') LIMIT 20;
+ERROR: None
+DB RESULTS: [{"team":"India"}]
+----------------------------------------
+
+[2026-04-23T05:56:03.375Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'matches' ORDER BY ordinal_position LIMIT 30
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'matches' ORDER BY ordinal_position LIMIT 30;
+ERROR: None
+DB RESULTS: [{"column_name":"match_id"},{"column_name":"match_type"},{"column_name":"gender"},{"column_name":"start_date"},{"column_name":"end_date"},{"column_name":"dates_json"},{"column_name":"venue"},{"column_name":"city"},{"column_name":"team1"},{"column_name":"team2"},{"column_name":"toss_winner"},{"column_name":"toss_decision"},{"column_name":"outcome_winner"},{"column_name":"outcome_result"},{"column_name":"outcome_by_type"},{"column_name":"outcome_by_value"},{"column_name":"balls_per_over"},{"column_name":"event_name"},{"column_name":"event_match_number"},{"column_name":"season"},{"column_name":"umpires_json"},{"column_name":"match_referees_json"},{"column_name":"json_file_path"},{"column_name":"data_version"},{"column_name":"imported_at"}]
+----------------------------------------
+
+[2026-04-23T05:56:07.528Z] USER QUERY: SELECT DISTINCT match_type FROM matches LIMIT 30
+SQL EXEC: SELECT DISTINCT match_type FROM matches LIMIT 30;
+ERROR: None
+DB RESULTS: [{"match_type":"Test"}]
+----------------------------------------
+
+[2026-04-23T05:56:44.141Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'matches' ORDER BY ordinal_position LIMIT 30
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'matches' ORDER BY ordinal_position LIMIT 30;
+ERROR: None
+DB RESULTS: [{"column_name":"match_id"},{"column_name":"match_type"},{"column_name":"gender"},{"column_name":"start_date"},{"column_name":"end_date"},{"column_name":"dates_json"},{"column_name":"venue"},{"column_name":"city"},{"column_name":"team1"},{"column_name":"team2"},{"column_name":"toss_winner"},{"column_name":"toss_decision"},{"column_name":"outcome_winner"},{"column_name":"outcome_result"},{"column_name":"outcome_by_type"},{"column_name":"outcome_by_value"},{"column_name":"balls_per_over"},{"column_name":"event_name"},{"column_name":"event_match_number"},{"column_name":"season"},{"column_name":"umpires_json"},{"column_name":"match_referees_json"},{"column_name":"json_file_path"},{"column_name":"data_version"},{"column_name":"imported_at"}]
+----------------------------------------
+
+[2026-04-23T05:59:18.497Z] USER QUERY: SELECT DISTINCT match_type FROM matches LIMIT 30
+SQL EXEC: SELECT DISTINCT match_type FROM matches LIMIT 30;
+ERROR: None
+DB RESULTS: [{"match_type":"Test"}]
+----------------------------------------
+
+[2026-04-23T06:03:31.733Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'player_profiles' ORDER BY ordinal_position
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'players' ORDER BY ordinal_position;
+ERROR: None
+DB RESULTS: [{"column_name":"identifier"},{"column_name":"name"}]
+----------------------------------------
+
+[2026-04-23T06:04:47.357Z] USER QUERY: SELECT 1
+SQL EXEC: SELECT 1;
+ERROR: None
+DB RESULTS: [{"?column?":1}]
+----------------------------------------
+
+[2026-04-23T06:06:11.644Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'player_profiles' ORDER BY ordinal_position
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'players' ORDER BY ordinal_position;
+ERROR: None
+DB RESULTS: [{"column_name":"identifier"},{"column_name":"name"}]
+----------------------------------------
+
+[2026-04-23T06:30:15.493Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'player_profiles' ORDER BY ordinal_position
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'players' ORDER BY ordinal_position;
+ERROR: None
+DB RESULTS: [{"column_name":"identifier"},{"column_name":"name"}]
+----------------------------------------
+
+[2026-04-23T06:36:06.589Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'player_profiles' ORDER BY ordinal_position
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'players' ORDER BY ordinal_position;
+ERROR: None
+DB RESULTS: [{"column_name":"identifier"},{"column_name":"name"}]
+----------------------------------------
+
+[2026-04-23T06:43:05.574Z] USER QUERY: SELECT column_name FROM information_schema.columns WHERE table_name = 'player_profiles' ORDER BY ordinal_position
+SQL EXEC: SELECT column_name FROM information_schema.columns WHERE table_name = 'players' ORDER BY ordinal_position;
+ERROR: None
+DB RESULTS: [{"column_name":"identifier"},{"column_name":"name"}]
+----------------------------------------

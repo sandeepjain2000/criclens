@@ -2,59 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Target, Zap, TrendingUp, Award, ChevronRight } from 'lucide-react';
 
-const PLAYERS_DB = [
-  { name:"Suryakumar Yadav", role:"BAT", country:"India",
-    chaseProfile:{ sr:192, avgRuns:38, successRate:71 },
-    powerplayProfile:{ sr:148, avgRuns:22, successRate:64 },
-    deathProfile:{ sr:204, avgRuns:24, successRate:69 },
-    highPressureRating: 92 },
-  { name:"Virat Kohli", role:"BAT", country:"India",
-    chaseProfile:{ sr:138, avgRuns:52, successRate:78 },
-    powerplayProfile:{ sr:125, avgRuns:34, successRate:74 },
-    deathProfile:{ sr:145, avgRuns:28, successRate:65 },
-    highPressureRating: 95 },
-  { name:"Jos Buttler", role:"WK", country:"England",
-    chaseProfile:{ sr:158, avgRuns:44, successRate:70 },
-    powerplayProfile:{ sr:162, avgRuns:38, successRate:68 },
-    deathProfile:{ sr:175, avgRuns:22, successRate:63 },
-    highPressureRating: 88 },
-  { name:"Rohit Sharma", role:"BAT", country:"India",
-    chaseProfile:{ sr:128, avgRuns:40, successRate:65 },
-    powerplayProfile:{ sr:145, avgRuns:42, successRate:70 },
-    deathProfile:{ sr:138, avgRuns:18, successRate:58 },
-    highPressureRating: 82 },
-  { name:"Hardik Pandya", role:"AR", country:"India",
-    chaseProfile:{ sr:162, avgRuns:28, successRate:68 },
-    powerplayProfile:{ sr:130, avgRuns:20, successRate:61 },
-    deathProfile:{ sr:188, avgRuns:32, successRate:72 },
-    highPressureRating: 84 },
-  { name:"Babar Azam", role:"BAT", country:"Pakistan",
-    chaseProfile:{ sr:125, avgRuns:48, successRate:74 },
-    powerplayProfile:{ sr:118, avgRuns:36, successRate:70 },
-    deathProfile:{ sr:130, avgRuns:16, successRate:54 },
-    highPressureRating: 80 },
-  { name:"Glenn Maxwell", role:"AR", country:"Australia",
-    chaseProfile:{ sr:172, avgRuns:32, successRate:64 },
-    powerplayProfile:{ sr:148, avgRuns:24, successRate:60 },
-    deathProfile:{ sr:198, avgRuns:30, successRate:68 },
-    highPressureRating: 87 },
-  { name:"Liam Livingstone", role:"AR", country:"England",
-    chaseProfile:{ sr:168, avgRuns:30, successRate:62 },
-    powerplayProfile:{ sr:158, avgRuns:28, successRate:60 },
-    deathProfile:{ sr:195, avgRuns:26, successRate:65 },
-    highPressureRating: 79 },
-  { name:"KL Rahul", role:"WK", country:"India",
-    chaseProfile:{ sr:132, avgRuns:38, successRate:68 },
-    powerplayProfile:{ sr:140, avgRuns:32, successRate:66 },
-    deathProfile:{ sr:128, avgRuns:14, successRate:52 },
-    highPressureRating: 76 },
-  { name:"Quinton de Kock", role:"WK", country:"S. Africa",
-    chaseProfile:{ sr:142, avgRuns:36, successRate:66 },
-    powerplayProfile:{ sr:152, avgRuns:40, successRate:68 },
-    deathProfile:{ sr:145, avgRuns:16, successRate:56 },
-    highPressureRating: 82 },
-];
-
+// Remove hardcoded PLAYERS_DB
 function detectPhase(oversLeft, wicketsDown) {
   if (oversLeft > 15) return "powerplay";
   if (oversLeft <= 5) return "death";
@@ -84,17 +32,33 @@ export default function SituationSimulator() {
   const [wickets,   setWickets]   = useState(3);
   const [crr,       setCrr]       = useState(9.2);
   const [simulated, setSimulated] = useState(false);
+  const [playersData, setPlayersData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/t20/situation-sim')
+      .then(r => r.json())
+      .then(d => {
+        setPlayersData(d.data || []);
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setLoading(false);
+      });
+  }, []);
 
   const rrr = oversLeft > 0 ? ((target - Math.round(crr * (20 - oversLeft))) / oversLeft).toFixed(1) : "—";
   const phase = detectPhase(oversLeft, wickets);
 
   const ranked = useMemo(() => {
-    if (!simulated) return [];
-    return [...PLAYERS_DB]
+    if (!simulated || !playersData.length) return [];
+    return [...playersData]
       .map(p => scorePlayer(p, target, oversLeft, wickets, crr))
+      .filter(p => p.profile && p.profile.sr > 0) // Filter out missing profiles
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
-  }, [simulated, target, oversLeft, wickets, crr]);
+  }, [simulated, target, oversLeft, wickets, crr, playersData]);
 
   const scenarioLabel = () => {
     const needed = target - Math.round(crr * (20 - oversLeft));
@@ -206,7 +170,14 @@ export default function SituationSimulator() {
 
         {/* Results Panel */}
         <div>
-          {!simulated ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-full text-center py-20 text-slate-400">
+              <div className="animate-pulse flex flex-col items-center">
+                <Target size={48} className="mb-4 opacity-30"/>
+                <p className="font-bold text-sm uppercase tracking-widest">Loading simulator engine...</p>
+              </div>
+            </div>
+          ) : !simulated ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-20 text-slate-400">
               <Target size={48} className="mb-4 opacity-30"/>
               <p className="font-bold text-lg">Set the scenario and click</p>

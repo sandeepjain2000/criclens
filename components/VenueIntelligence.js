@@ -3,67 +3,9 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 import { MapPin, TrendingUp, Shield, Zap } from 'lucide-react';
 
-const VENUES = [
-  {
-    name: "Wankhede Stadium", city: "Mumbai", country: "India",
-    avg1st: 178, avg2nd: 158, chaseWin: 42, paceAdv: 58, spinAdv: 42,
-    tossWinBat: 48, avgBoundaries: 18.4, pitchType: "Batting",
-    topBatter: "Rohit Sharma", topBowler: "Jasprit Bumrah",
-    hostTeam: "India", dayNightSplit: {day:30, night:70},
-  },
-  {
-    name: "Eden Gardens", city: "Kolkata", country: "India",
-    avg1st: 168, avg2nd: 155, chaseWin: 51, paceAdv: 45, spinAdv: 55,
-    tossWinBat: 44, avgBoundaries: 16.8, pitchType: "Spin-friendly",
-    topBatter: "Virat Kohli", topBowler: "Rashid Khan",
-    hostTeam: "India", dayNightSplit: {day:20, night:80},
-  },
-  {
-    name: "Dubai International Stadium", city: "Dubai", country: "UAE",
-    avg1st: 154, avg2nd: 138, chaseWin: 39, paceAdv: 38, spinAdv: 62,
-    tossWinBat: 35, avgBoundaries: 14.2, pitchType: "Spin-dominant",
-    topBatter: "Babar Azam", topBowler: "Rashid Khan",
-    hostTeam: "Neutral", dayNightSplit: {day:10, night:90},
-  },
-  {
-    name: "MCG", city: "Melbourne", country: "Australia",
-    avg1st: 172, avg2nd: 162, chaseWin: 54, paceAdv: 68, spinAdv: 32,
-    tossWinBat: 52, avgBoundaries: 17.9, pitchType: "Pace-friendly",
-    topBatter: "David Warner", topBowler: "Pat Cummins",
-    hostTeam: "Australia", dayNightSplit: {day:15, night:85},
-  },
-  {
-    name: "Narendra Modi Stadium", city: "Ahmedabad", country: "India",
-    avg1st: 185, avg2nd: 170, chaseWin: 47, paceAdv: 44, spinAdv: 56,
-    tossWinBat: 50, avgBoundaries: 19.1, pitchType: "Batting",
-    topBatter: "Suryakumar Yadav", topBowler: "Mohammed Siraj",
-    hostTeam: "India", dayNightSplit: {day:25, night:75},
-  },
-  {
-    name: "Lord's Cricket Ground", city: "London", country: "England",
-    avg1st: 158, avg2nd: 148, chaseWin: 46, paceAdv: 72, spinAdv: 28,
-    tossWinBat: 41, avgBoundaries: 15.6, pitchType: "Seam-friendly",
-    topBatter: "Jos Buttler", topBowler: "Jofra Archer",
-    hostTeam: "England", dayNightSplit: {day:60, night:40},
-  },
-  {
-    name: "SuperSport Park", city: "Centurion", country: "South Africa",
-    avg1st: 176, avg2nd: 160, chaseWin: 43, paceAdv: 65, spinAdv: 35,
-    tossWinBat: 46, avgBoundaries: 17.3, pitchType: "Pace & Bounce",
-    topBatter: "Quinton de Kock", topBowler: "Kagiso Rabada",
-    hostTeam: "South Africa", dayNightSplit: {day:40, night:60},
-  },
-  {
-    name: "Pallekele International", city: "Kandy", country: "Sri Lanka",
-    avg1st: 162, avg2nd: 148, chaseWin: 45, paceAdv: 30, spinAdv: 70,
-    tossWinBat: 38, avgBoundaries: 15.1, pitchType: "Spin-dominant",
-    topBatter: "Kusal Mendis", topBowler: "Wanindu Hasaranga",
-    hostTeam: "Sri Lanka", dayNightSplit: {day:35, night:65},
-  },
-];
-
 const PITCH_COLORS = {
   "Batting":        "#10b981",
+  "Balanced":       "#22d3ee",
   "Spin-friendly":  "#f59e0b",
   "Spin-dominant":  "#f97316",
   "Pace-friendly":  "#3b82f6",
@@ -121,12 +63,30 @@ function VenueCard({ venue, onClick, selected }) {
 }
 
 export default function VenueIntelligence() {
-  const [selected, setSelected] = useState(VENUES[0]);
+  const [venues, setVenues] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const paceSpinData = [
+  React.useEffect(() => {
+    fetch('/api/t20/venue-intel')
+      .then(r => r.json())
+      .then(d => {
+        setVenues(d.data || []);
+        if (d.data && d.data.length > 0) {
+          setSelected(d.data[0]);
+        }
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setLoading(false);
+      });
+  }, []);
+
+  const paceSpinData = selected ? [
     { label: "Pace", value: selected.paceAdv, color: "#3b82f6" },
     { label: "Spin", value: selected.spinAdv, color: "#f59e0b" },
-  ];
+  ] : [];
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-2">
@@ -142,12 +102,19 @@ export default function VenueIntelligence() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Venue list */}
         <div className="lg:col-span-1 space-y-3 max-h-[780px] overflow-y-auto pr-1 custom-scrollbar">
-          {VENUES.map(v => (
-            <VenueCard key={v.name} venue={v} onClick={setSelected} selected={selected.name === v.name}/>
-          ))}
+          {loading ? (
+            <div className="text-center py-10 text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">Loading venue data...</div>
+          ) : venues.length === 0 ? (
+            <div className="text-center py-10 text-slate-400 font-bold uppercase tracking-widest text-xs">No venue data available</div>
+          ) : (
+            venues.map(v => (
+              <VenueCard key={v.name} venue={v} onClick={setSelected} selected={selected?.name === v.name}/>
+            ))
+          )}
         </div>
 
         {/* Detail panel */}
+        {selected && (
         <div className="lg:col-span-2 space-y-5">
           {/* Headline */}
           <div className="bg-slate-900 text-white rounded-2xl p-6">
@@ -247,6 +214,7 @@ export default function VenueIntelligence() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

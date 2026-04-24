@@ -3,30 +3,7 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Users, TrendingUp } from 'lucide-react';
 
-const PARTNERSHIPS = [
-  { p1:"Rohit Sharma",   p2:"Virat Kohli",      team:"India",   runs:1877, innings:62, avg:31.3, highest:160, sr:138, phase:"Any",      winRate:72 },
-  { p1:"Jos Buttler",    p2:"Alex Hales",        team:"England", runs:1072, innings:24, avg:47.5, highest:170, sr:165, phase:"Powerplay", winRate:79 },
-  { p1:"Babar Azam",     p2:"Mohammad Rizwan",   team:"Pakistan",runs:2283, innings:75, avg:32.6, highest:203, sr:126, phase:"Any",       winRate:68 },
-  { p1:"Suryakumar Yadav",p2:"Hardik Pandya",   team:"India",   runs: 876, innings:38, avg:23.7, highest: 95, sr:162, phase:"Death",     winRate:74 },
-  { p1:"Travis Head",    p2:"David Warner",      team:"Australia",runs:1254,innings:42, avg:30.9, highest:144, sr:153, phase:"Powerplay", winRate:71 },
-  { p1:"Devon Conway",   p2:"Finn Allen",        team:"N. Zealand",runs:698,innings:22, avg:33.2, highest:121, sr:144, phase:"Powerplay", winRate:68 },
-  { p1:"Quinton de Kock",p2:"Temba Bavuma",      team:"S. Africa",runs:842, innings:31, avg:27.2, highest:115, sr:134, phase:"Any",       winRate:65 },
-  { p1:"Gurbaz",         p2:"Ibrahim Zadran",    team:"Afghanistan",runs:768,innings:28,avg:28.4, highest:132, sr:141, phase:"Powerplay", winRate:64 },
-];
-
-const PHASE_DATA = [
-  { phase:"Powerplay", avgRuns:54, avgSR:142, winImpact:68 },
-  { phase:"Middle",    avgRuns:38, avgSR:128, winImpact:52 },
-  { phase:"Death",     avgRuns:46, avgSR:172, winImpact:71 },
-];
-
-const TEAM_PAIRS = [
-  { team:"India",    topPair:"Rohit-Kohli",    avgPartnership:42, pairsUsed:12 },
-  { team:"Pakistan", topPair:"Babar-Rizwan",   avgPartnership:38, pairsUsed:8  },
-  { team:"England",  topPair:"Buttler-Hales",  avgPartnership:44, pairsUsed:11 },
-  { team:"Australia",topPair:"Head-Warner",    avgPartnership:36, pairsUsed:10 },
-  { team:"S. Africa",topPair:"DeKock-Bavuma",  avgPartnership:32, pairsUsed:9  },
-];
+// Remove hardcoded PARTNERSHIPS, PHASE_DATA, and TEAM_PAIRS
 
 const COLORS = ["#10b981","#6366f1","#f59e0b","#ef4444","#8b5cf6","#3b82f6","#ec4899","#14b8a6"];
 
@@ -35,7 +12,27 @@ export default function PartnershipAnalytics() {
   const [sortK, setSortK] = useState("runs");
   const [sortD, setSortD] = useState("desc");
 
-  const sorted = [...PARTNERSHIPS].sort((a, b) => {
+  const [partnerships, setPartnerships] = useState([]);
+  const [phaseData, setPhaseData] = useState([]);
+  const [teamPairs, setTeamPairs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/t20/partnerships')
+      .then(r => r.json())
+      .then(d => {
+        setPartnerships(d.partnerships || []);
+        setPhaseData(d.phaseData || []);
+        setTeamPairs(d.teamPairs || []);
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setLoading(false);
+      });
+  }, []);
+
+  const sorted = [...partnerships].sort((a, b) => {
     return sortD === "desc" ? b[sortK] - a[sortK] : a[sortK] - b[sortK];
   });
 
@@ -114,7 +111,19 @@ export default function PartnershipAnalytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.map((p,i)=>(
+                  {loading ? (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+                        Loading partnership data...
+                      </td>
+                    </tr>
+                  ) : sorted.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="px-4 py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
+                        No partnerships found
+                      </td>
+                    </tr>
+                  ) : sorted.map((p,i)=>(
                     <tr key={`${p.p1}-${p.p2}`} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3.5 text-center">
                         {i===0?"🥇":i===1?"🥈":i===2?"🥉":<span className="text-xs text-slate-400">{i+1}</span>}
@@ -148,7 +157,11 @@ export default function PartnershipAnalytics() {
       {/* === TAB: BY PHASE === */}
       {tab === "phase" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {PHASE_DATA.map(ph=>(
+          {loading ? (
+            <div className="col-span-3 text-center py-20 text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+              Loading phase data...
+            </div>
+          ) : phaseData.map(ph=>(
             <div key={ph.phase} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
               <h3 className="font-black text-slate-800 text-lg mb-1">{ph.phase}</h3>
               <p className="text-xs text-slate-500 mb-5">Avg partnership stats</p>
@@ -177,7 +190,11 @@ export default function PartnershipAnalytics() {
           <div className="px-6 py-4 border-b border-slate-100">
             <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest">Partnership Statistics by Country</h3>
           </div>
-          {TEAM_PAIRS.map((t,i)=>(
+          {loading ? (
+            <div className="px-6 py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+              Loading team pairs...
+            </div>
+          ) : teamPairs.map((t,i)=>(
             <div key={t.team} className="flex items-center gap-4 px-6 py-4 border-b border-slate-50 hover:bg-slate-50">
               <span className="text-xs font-mono text-slate-400 w-6 text-right">{i+1}</span>
               <div className="flex-1">

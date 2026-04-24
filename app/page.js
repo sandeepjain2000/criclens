@@ -24,6 +24,7 @@ import T20TeamRatingsPage from '../components/T20TeamRatingsPage';
 import T20SliceDice from '../components/T20SliceDice';
 import LOIRatingsPage from '../components/LOIRatingsPage';
 import LOITeamRatingsPage from '../components/LOITeamRatingsPage';
+import PlayerManager from '../components/PlayerManager';
 
 // Role badge config (mirrors RankingsPage)
 const VAULT_ROLE_CONFIG = {
@@ -226,6 +227,7 @@ function TestDashboard({ onBack, format = 'test' }) {
           <SidebarItem icon={Database}  label="Player Vault"   active={activeTab === 'vault'}          onClick={() => setActiveTab('vault')} />
           <SidebarItem icon={BarChart2} label="Analytics Hub"  active={activeTab === 'analytics'}      onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={UserCheck} label="Team Selector"  active={activeTab === 'team-selector'}  onClick={() => setActiveTab('team-selector')} />
+          <SidebarItem icon={Database}  label="Player Manager" active={activeTab === 'player-manager'} onClick={() => setActiveTab('player-manager')} />
 
           <div style={{ height: '1px', backgroundColor: '#e2e8f0', margin: '0.75rem 0' }} />
 
@@ -763,6 +765,11 @@ function TestDashboard({ onBack, format = 'test' }) {
           {/* TAB: TEAM SELECTOR */}
           {activeTab === 'team-selector' && (
             <TeamSelector />
+          )}
+
+          {/* TAB: PLAYER MANAGER */}
+          {activeTab === 'player-manager' && (
+            <PlayerManager />
           )}
 
         </div>

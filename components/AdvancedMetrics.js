@@ -11,31 +11,7 @@ const METRIC_DEFS = {
   dotPct:       { label: "Dot %",          hint: "Percentage of balls faced that resulted in no run.", format: v => `${v}%` },
 };
 
-const BATTER_DATA = [
-  { name:"Suryakumar Yadav", country:"India",    xRuns:62.4, pressureIdx:128, consistency:58, impactPerBall:0.482, boundaryCat:28, dotPct:32 },
-  { name:"Virat Kohli",       country:"India",    xRuns:54.8, pressureIdx:121, consistency:74, impactPerBall:0.358, boundaryCat:20, dotPct:38 },
-  { name:"Jos Buttler",       country:"England",  xRuns:52.1, pressureIdx:118, consistency:62, impactPerBall:0.412, boundaryCat:24, dotPct:35 },
-  { name:"Glenn Maxwell",     country:"Australia",xRuns:48.6, pressureIdx:135, consistency:44, impactPerBall:0.444, boundaryCat:26, dotPct:30 },
-  { name:"Rohit Sharma",      country:"India",    xRuns:46.2, pressureIdx:104, consistency:60, impactPerBall:0.305, boundaryCat:22, dotPct:36 },
-  { name:"Babar Azam",        country:"Pakistan", xRuns:50.8, pressureIdx: 97, consistency:78, impactPerBall:0.285, boundaryCat:18, dotPct:41 },
-  { name:"Tim David",         country:"Singapore",xRuns:44.2, pressureIdx:142, consistency:50, impactPerBall:0.468, boundaryCat:30, dotPct:28 },
-  { name:"Hardik Pandya",     country:"India",    xRuns:38.5, pressureIdx:118, consistency:52, impactPerBall:0.398, boundaryCat:25, dotPct:33 },
-  { name:"Liam Livingstone",  country:"England",  xRuns:42.8, pressureIdx:122, consistency:47, impactPerBall:0.426, boundaryCat:29, dotPct:29 },
-  { name:"David Miller",      country:"S. Africa",xRuns:40.1, pressureIdx:126, consistency:54, impactPerBall:0.375, boundaryCat:24, dotPct:34 },
-  { name:"KL Rahul",          country:"India",    xRuns:38.8, pressureIdx: 94, consistency:68, impactPerBall:0.278, boundaryCat:19, dotPct:40 },
-  { name:"Devon Conway",      country:"N. Zealand",xRuns:36.5, pressureIdx: 98, consistency:76, impactPerBall:0.245, boundaryCat:16, dotPct:43 },
-];
-
-const BOWLER_DATA = [
-  { name:"Jasprit Bumrah",    country:"India",    xRuns:-8.2, pressureIdx:148, consistency:72, impactPerBall:0.512, boundaryCat:8,  dotPct:54 },
-  { name:"Rashid Khan",       country:"Afghanistan",xRuns:-6.4,pressureIdx:140, consistency:68, impactPerBall:0.478, boundaryCat:6,  dotPct:58 },
-  { name:"Trent Boult",       country:"N. Zealand",xRuns:-5.8, pressureIdx:132, consistency:65, impactPerBall:0.425, boundaryCat:9,  dotPct:51 },
-  { name:"Shaheen Afridi",    country:"Pakistan", xRuns:-5.2, pressureIdx:128, consistency:60, impactPerBall:0.398, boundaryCat:10, dotPct:50 },
-  { name:"Pat Cummins",       country:"Australia",xRuns:-4.8, pressureIdx:124, consistency:62, impactPerBall:0.372, boundaryCat:11, dotPct:49 },
-  { name:"Adil Rashid",       country:"England",  xRuns:-4.4, pressureIdx:118, consistency:58, impactPerBall:0.345, boundaryCat:7,  dotPct:52 },
-  { name:"Wanindu Hasaranga", country:"Sri Lanka",xRuns:-4.2, pressureIdx:120, consistency:62, impactPerBall:0.338, boundaryCat:8,  dotPct:53 },
-  { name:"Kagiso Rabada",     country:"S. Africa",xRuns:-3.8, pressureIdx:116, consistency:55, impactPerBall:0.318, boundaryCat:12, dotPct:47 },
-];
+// Remove hardcoded BATTER_DATA and BOWLER_DATA
 
 function MetricCell({ value, metricKey, allValues }) {
   const def   = METRIC_DEFS[metricKey];
@@ -74,10 +50,29 @@ export default function AdvancedMetrics() {
   const [tab,  setTab]  = useState("batters");
   const [sortK, setSortK] = useState("pressureIdx");
   const [sortD, setSortD] = useState("desc");
+  
+  const [batters, setBatters] = useState([]);
+  const [bowlers, setBowlers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const rawData = tab === "batters" ? BATTER_DATA : BOWLER_DATA;
+  React.useEffect(() => {
+    fetch('/api/t20/advanced-metrics')
+      .then(r => r.json())
+      .then(d => {
+        setBatters(d.batters || []);
+        setBowlers(d.bowlers || []);
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setLoading(false);
+      });
+  }, []);
+
+  const rawData = tab === "batters" ? batters : bowlers;
 
   const data = useMemo(() => {
+    if (!rawData.length) return [];
     return [...rawData].sort((a, b) => {
       const va = a[sortK], vb = b[sortK];
       return sortD === "desc" ? vb - va : va - vb;
@@ -145,26 +140,42 @@ export default function AdvancedMetrics() {
               </tr>
             </thead>
             <tbody>
-              {data.map((row, i) => (
-                <tr key={row.name} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i < 3 ? "bg-emerald-50/20" : ""}`}>
-                  <td className="px-4 py-3.5 text-center">
-                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="text-xs text-slate-400 font-mono">{i+1}</span>}
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+                    Loading advanced metrics...
                   </td>
-                  <td className="px-4 py-3.5">
-                    <div className="font-black text-slate-800 whitespace-nowrap">{row.name}</div>
-                    <div className="text-xs text-slate-400">{row.country}</div>
-                  </td>
-                  {Object.keys(METRIC_DEFS).map(k => (
-                    <MetricCell key={k} value={row[k]} metricKey={k} allValues={allValues(k)}/>
-                  ))}
                 </tr>
-              ))}
+              ) : data.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                data.map((row, i) => (
+                  <tr key={row.name} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i < 3 ? "bg-emerald-50/20" : ""}`}>
+                    <td className="px-4 py-3.5 text-center">
+                      {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="text-xs text-slate-400 font-mono">{i+1}</span>}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <div className="font-black text-slate-800 whitespace-nowrap">{row.name}</div>
+                      <div className="text-xs text-slate-400">{row.country}</div>
+                    </td>
+                    {Object.keys(METRIC_DEFS).map(k => (
+                      <MetricCell key={k} value={row[k]} metricKey={k} allValues={allValues(k)}/>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-400">
-          <span className="font-bold">Color coding:</span> <span className="text-emerald-600 font-bold">Green</span> = top quartile · <span className="text-amber-600 font-bold">Amber</span> = mid · <span className="text-red-500 font-bold">Red</span> = bottom quartile · Click any header to sort
-        </div>
+        {!loading && (
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-400">
+            <span className="font-bold">Color coding:</span> <span className="text-emerald-600 font-bold">Green</span> = top quartile · <span className="text-amber-600 font-bold">Amber</span> = mid · <span className="text-red-500 font-bold">Red</span> = bottom quartile · Click any header to sort
+          </div>
+        )}
       </div>
     </div>
   );
