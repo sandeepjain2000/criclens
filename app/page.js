@@ -229,8 +229,8 @@ function TestDashboard({ onBack, format = 'test' }) {
 
   return (
     <div className="flex h-screen bg-white">
-      {/* Temporary Screen Number Badge */}
-      <div className="fixed top-2 right-2 z-[9999] bg-red-600 text-white text-xs font-mono font-bold px-2 py-1 rounded shadow-md pointer-events-none">
+      {/* Temporary Screen Number Badge - Using inline styles to guarantee visibility */}
+      <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 2147483647, backgroundColor: '#dc2626', color: 'white', fontSize: '14px', fontFamily: 'monospace', fontWeight: 'bold', padding: '4px 12px', borderRadius: '6px', pointerEvents: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
         {SCREEN_MAP[activeTab] || 'S-?'}
       </div>
 
@@ -1049,7 +1049,9 @@ function LandingPage({ onSelectFormat }) {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative">
       {/* Temporary Screen Number Badge */}
-      <div className="fixed top-2 right-2 z-[9999] bg-red-600 text-white text-xs font-mono font-bold px-2 py-1 rounded shadow-md pointer-events-none">S-0</div>
+      <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 2147483647, backgroundColor: '#dc2626', color: 'white', fontSize: '14px', fontFamily: 'monospace', fontWeight: 'bold', padding: '4px 12px', borderRadius: '6px', pointerEvents: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+        S-0
+      </div>
       
       {/* Captcha Modal Overlay */}
       {showCaptcha && (
