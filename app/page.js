@@ -202,8 +202,38 @@ function TestDashboard({ onBack, format = 'test' }) {
     }
   };
 
+  const SCREEN_MAP = {
+    'matchups': 'S-1',
+    'vault': 'S-2',
+    'analytics': 'S-3',
+    'team-selector': 'S-4',
+    'player-manager': 'S-5',
+    'rankings': 'S-6',
+    'team-rankings': 'S-7',
+    't20-ratings': 'S-8',
+    't20-team-ratings': 'S-9',
+    't20-lab': 'S-10',
+    'form-tracker': 'S-11',
+    'venue-intel': 'S-12',
+    'situation-sim': 'S-13',
+    'battle-cards': 'S-14',
+    'similar-players': 'S-15',
+    'adv-metrics': 'S-16',
+    'predictor': 'S-17',
+    'tournaments': 'S-18',
+    'partnerships': 'S-19',
+    'reports': 'S-20',
+    'loi-ratings': 'S-21',
+    'loi-team-ratings': 'S-22'
+  };
+
   return (
     <div className="flex h-screen bg-white">
+      {/* Temporary Screen Number Badge */}
+      <div className="fixed top-2 right-2 z-[9999] bg-red-600 text-white text-xs font-mono font-bold px-2 py-1 rounded shadow-md pointer-events-none">
+        {SCREEN_MAP[activeTab] || 'S-?'}
+      </div>
+
       {/* Sidebar */}
       <aside className="w-64 border-r border-slate-200 flex flex-col p-4 z-20" style={{ backgroundColor: 'var(--bg-sidebar)' }}>
         <div className="flex items-center space-x-2 px-4 mb-4 mt-2">
@@ -1018,6 +1048,8 @@ function LandingPage({ onSelectFormat }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative">
+      {/* Temporary Screen Number Badge */}
+      <div className="fixed top-2 right-2 z-[9999] bg-red-600 text-white text-xs font-mono font-bold px-2 py-1 rounded shadow-md pointer-events-none">S-0</div>
       
       {/* Captcha Modal Overlay */}
       {showCaptcha && (
